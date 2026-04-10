@@ -4,6 +4,7 @@
 
 import { NavLink, Outlet, useParams } from 'react-router-dom';
 import { useAuthStore } from '@/stores/authStore';
+import RedFlagBanner from './RedFlagBanner';
 
 function NavItem({ to, label }: { to: string; label: string }) {
   return (
@@ -65,6 +66,7 @@ export default function Layout() {
 
         {/* Contenido */}
         <main className="flex-1 overflow-auto">
+          {orgId && <RedFlagBanner orgId={orgId} />}
           <Outlet />
         </main>
       </div>

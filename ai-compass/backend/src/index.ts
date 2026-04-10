@@ -10,6 +10,7 @@ import transcriptRoutes from './routes/transcripts';
 import committeeRoutes from './routes/committees';
 import pilotRoutes from './routes/pilots';
 import aiRoutes from './routes/ai';
+import redFlagRoutes from './routes/redFlags';
 
 const app = express();
 
@@ -28,6 +29,7 @@ app.use('/api/transcripts', transcriptRoutes);
 app.use('/api/committees', committeeRoutes);
 app.use('/api/pilots', pilotRoutes);
 app.use('/api/ai', aiRoutes);
+app.use('/api/red-flags', redFlagRoutes);
 
 app.use(errorHandler);
 
