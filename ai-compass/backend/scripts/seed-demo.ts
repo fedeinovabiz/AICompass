@@ -2,7 +2,7 @@ import { Pool } from 'pg';
 import bcrypt from 'bcryptjs';
 
 const pool = new Pool({
-  connectionString: 'postgresql://postgres:postgres@localhost:5432/ai_compass',
+  connectionString: process.env.DATABASE_URL || 'postgresql://postgres:admin@localhost:5432/ai_compass',
 });
 
 async function seed() {
