@@ -2,12 +2,14 @@
 // MaturityMapPage — Mapa de madurez de la organización
 // ══════════════════════════════════════════════
 
-import { useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
 import { useOrganizationStore } from '@/stores/organizationStore';
 import { useSessionStore } from '@/stores/sessionStore';
+import { apiGet, apiPost } from '@/services/apiClient';
 import StageMap from '@/components/StageMap';
-import type { DimensionKey } from '@/types';
+import SpiderChart from '@/components/SpiderChart';
+import type { DimensionKey, Engagement, CrossSessionAnalysis } from '@/types';
 
 const DIMENSION_LABELS: Record<DimensionKey, string> = {
   estrategia: 'Estrategia',
@@ -75,13 +77,24 @@ export default function MaturityMapPage() {
     error,
   } = useOrganizationStore();
   const { sessions, fetchSessions } = useSessionStore();
+  const [, setEngagementId] = useState<string | null>(null);
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (!orgId) return;
     if (!currentOrganization || currentOrganization.id !== orgId) {
       void fetchOrganization(orgId);
     }
-    void fetchSessions(orgId);
+    apiGet<Engagement[]>(`/engagements/organization/${orgId}`)
+      .then((engs) => {
+        const active = engs.find((e) => e.status === 'active') ?? engs[0];
+        if (active) {
+          setEngagementId(active.id);
+          void fetchSessions(active.id);
+        }
+      })
+      .catch(() => { /* sin engagement */ });
   }, [orgId, fetchOrganization, fetchSessions, currentOrganization]);
 
   if (isLoading && !currentOrganization) {
@@ -116,7 +129,7 @@ export default function MaturityMapPage() {
         <StageMap currentStage={currentOrganization.currentStage} />
       </section>
 
-      {/* Spider Chart placeholder — M11 lo implementará */}
+      {/* Spider Chart */}
       <section className="bg-gray-900 border border-gray-700 rounded-xl p-6 space-y-3">
         <h2 className="text-sm font-semibold text-gray-400 uppercase tracking-wide">
           Radar de dimensiones
@@ -124,14 +137,7 @@ export default function MaturityMapPage() {
 
         {showScores ? (
           <>
-            <div className="bg-gray-800 rounded-lg p-8 flex items-center justify-center border-2 border-dashed border-gray-600">
-              <div className="text-center space-y-2">
-                <p className="text-gray-400 font-medium">Spider Chart pendiente M11</p>
-                <p className="text-xs text-gray-600">
-                  El componente gráfico se implementará en el módulo M11.
-                </p>
-              </div>
-            </div>
+            <SpiderChart scores={scores} />
             <MaturityScoreBars scores={scores} />
           </>
         ) : (
@@ -140,7 +146,7 @@ export default function MaturityMapPage() {
               Sin scores de madurez calculados aún.
             </p>
             <p className="text-xs text-gray-600">
-              Completá al menos 3 sesiones validadas y ejecutá el análisis cross-sesión.
+              Completa al menos 3 sesiones validadas y ejecuta el análisis cross-sesión.
             </p>
           </div>
         )}
@@ -167,21 +173,42 @@ export default function MaturityMapPage() {
       </section>
 
       {/* Botón análisis cross-sesión */}
-      <div className="pb-2">
+      <div className="pb-2 flex gap-3 items-center">
         <button
           type="button"
-          disabled={validatedSessions.length < 2}
+          disabled={validatedSessions.length < 2 || isAnalyzing}
           className="px-6 py-2.5 bg-purple-600 hover:bg-purple-500 disabled:opacity-40 disabled:cursor-not-allowed text-white font-medium rounded-xl transition-colors"
-          onClick={() => {
-            // M11 implementará la lógica de análisis cross-sesión
-            // Por ahora es un placeholder
+          onClick={async () => {
+            if (!orgId) return;
+            setIsAnalyzing(true);
+            try {
+              const sessionIds = validatedSessions.map((s) => s.id);
+              await apiPost<CrossSessionAnalysis>('/ai/cross-analysis', {
+                organizationId: orgId,
+                sessionIds,
+              });
+              await fetchOrganization(orgId);
+            } catch {
+              // Error manejado por el store
+            } finally {
+              setIsAnalyzing(false);
+            }
           }}
         >
-          Generar análisis cross-sesión
+          {isAnalyzing ? 'Analizando...' : 'Generar análisis cross-sesión'}
         </button>
+        {showScores && (
+          <button
+            type="button"
+            onClick={() => navigate(`/org/${orgId}/diagnostic`)}
+            className="px-6 py-2.5 bg-blue-600 hover:bg-blue-500 text-white font-medium rounded-xl transition-colors"
+          >
+            Ver diagnóstico completo
+          </button>
+        )}
         {validatedSessions.length < 2 && (
-          <p className="text-xs text-gray-500 mt-1">
-            Necesitás al menos 2 sesiones validadas para generar el análisis.
+          <p className="text-xs text-gray-500">
+            Se necesitan al menos 2 sesiones validadas para generar el análisis.
           </p>
         )}
       </div>
