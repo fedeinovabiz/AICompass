@@ -59,7 +59,7 @@ export const useSessionStore = create<SessionState>((set, get) => ({
   fetchSessions: async (engagementId: string) => {
     set({ isLoading: true, error: null });
     try {
-      const sessions = await apiGet<Session[]>(`/api/sessions/engagement/${engagementId}`);
+      const sessions = await apiGet<Session[]>(`/sessions/engagement/${engagementId}`);
       set({ sessions, isLoading: false });
     } catch (err) {
       const message = err instanceof Error ? err.message : 'Error al cargar sesiones';
@@ -70,7 +70,7 @@ export const useSessionStore = create<SessionState>((set, get) => ({
   fetchSession: async (id: string) => {
     set({ isLoading: true, error: null });
     try {
-      const session = await apiGet<Session>(`/api/sessions/${id}`);
+      const session = await apiGet<Session>(`/sessions/${id}`);
       set({ currentSession: session, isLoading: false });
     } catch (err) {
       const message = err instanceof Error ? err.message : 'Error al cargar sesión';
@@ -81,7 +81,7 @@ export const useSessionStore = create<SessionState>((set, get) => ({
   createSession: async (data: CreateSessionData) => {
     set({ isLoading: true, error: null });
     try {
-      const session = await apiPost<Session>('/api/sessions', data);
+      const session = await apiPost<Session>('/sessions', data);
       set((state) => ({
         sessions: [...state.sessions, session],
         isLoading: false,
@@ -97,7 +97,7 @@ export const useSessionStore = create<SessionState>((set, get) => ({
   updateSession: async (id: string, data: UpdateSessionData) => {
     set({ isLoading: true, error: null });
     try {
-      const updated = await apiPut<Session>(`/api/sessions/${id}`, data);
+      const updated = await apiPut<Session>(`/sessions/${id}`, data);
       set((state) => ({
         sessions: state.sessions.map((s) => (s.id === id ? updated : s)),
         currentSession: state.currentSession?.id === id ? updated : state.currentSession,
@@ -113,7 +113,7 @@ export const useSessionStore = create<SessionState>((set, get) => ({
   updateQuestionAnswer: async (sessionId: string, questionId: string, data: UpdateQuestionAnswerData) => {
     try {
       await apiPut(
-        `/api/sessions/${sessionId}/questions/${questionId}`,
+        `/sessions/${sessionId}/questions/${questionId}`,
         data,
       );
       await get().fetchSession(sessionId);
@@ -126,7 +126,7 @@ export const useSessionStore = create<SessionState>((set, get) => ({
 
   addParticipant: async (sessionId: string, p: Omit<Participant, 'id'>) => {
     try {
-      await apiPost(`/api/sessions/${sessionId}/participants`, p);
+      await apiPost(`/sessions/${sessionId}/participants`, p);
       await get().fetchSession(sessionId);
     } catch (err) {
       const message = err instanceof Error ? err.message : 'Error al agregar participante';
@@ -149,7 +149,7 @@ export const useSessionStore = create<SessionState>((set, get) => ({
       }));
     }
     try {
-      await apiDel(`/api/sessions/${sessionId}/participants/${pid}`);
+      await apiDel(`/sessions/${sessionId}/participants/${pid}`);
     } catch (err) {
       // Revertir optimistic update
       if (prevSession) set({ currentSession: prevSession });
@@ -162,7 +162,7 @@ export const useSessionStore = create<SessionState>((set, get) => ({
   processWithAI: async (sessionId: string) => {
     set({ isProcessingAI: true, error: null });
     try {
-      await apiPost(`/api/ai/process-session/${sessionId}`, {});
+      await apiPost(`/ai/process-session/${sessionId}`, {});
       await get().fetchSession(sessionId);
       set({ isProcessingAI: false });
     } catch (err) {
@@ -180,7 +180,7 @@ export const useSessionStore = create<SessionState>((set, get) => ({
 
       const token = localStorage.getItem('token');
       const BASE_URL = import.meta.env.VITE_API_URL ?? '';
-      const response = await fetch(`${BASE_URL}/api/transcripts/${sessionId}`, {
+      const response = await fetch(`${BASE_URL}/transcripts/${sessionId}`, {
         method: 'POST',
         headers: token ? { Authorization: `Bearer ${token}` } : {},
         body: formData,
@@ -204,7 +204,7 @@ export const useSessionStore = create<SessionState>((set, get) => ({
   uploadTranscriptText: async (sessionId: string, text: string) => {
     set({ isLoading: true, error: null });
     try {
-      await apiPost(`/api/transcripts/${sessionId}/text`, { text });
+      await apiPost(`/transcripts/${sessionId}/text`, { text });
       // El backend retorna metadata, no la sesion completa; refrescar
       await get().fetchSession(sessionId);
       set({ isLoading: false });

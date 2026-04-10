@@ -33,7 +33,7 @@ export const useOrganizationStore = create<OrganizationState>((set) => ({
   fetchOrganizations: async () => {
     set({ isLoading: true, error: null });
     try {
-      const organizations = await apiGet<Organization[]>('/api/organizations');
+      const organizations = await apiGet<Organization[]>('/organizations');
       set({ organizations, isLoading: false });
     } catch (err) {
       const message = err instanceof Error ? err.message : 'Error al cargar organizaciones';
@@ -44,7 +44,7 @@ export const useOrganizationStore = create<OrganizationState>((set) => ({
   fetchOrganization: async (id: string) => {
     set({ isLoading: true, error: null });
     try {
-      const organization = await apiGet<Organization>(`/api/organizations/${id}`);
+      const organization = await apiGet<Organization>(`/organizations/${id}`);
       set({ currentOrganization: organization, isLoading: false });
     } catch (err) {
       const message = err instanceof Error ? err.message : 'Error al cargar organización';
@@ -55,7 +55,7 @@ export const useOrganizationStore = create<OrganizationState>((set) => ({
   createOrganization: async (data: CreateOrganizationData) => {
     set({ isLoading: true, error: null });
     try {
-      const organization = await apiPost<Organization>('/api/organizations', data);
+      const organization = await apiPost<Organization>('/organizations', data);
       set((state) => ({
         organizations: [...state.organizations, organization],
         isLoading: false,

@@ -24,7 +24,7 @@ export default function RedFlagBanner({ orgId }: BannerProps) {
 
   async function handleResolve(ruleId: string, resolution: string) {
     try {
-      await apiPut(`/api/red-flags/organization/${orgId}/flags/${ruleId}/resolve`, { resolution });
+      await apiPut(`/red-flags/organization/${orgId}/flags/${ruleId}/resolve`, { resolution });
       refetch();
     } catch {
       // Error silencioso: el usuario ya realizó la acción
@@ -33,7 +33,7 @@ export default function RedFlagBanner({ orgId }: BannerProps) {
 
   async function handleOverride(ruleId: string, justification: string) {
     try {
-      await apiPut(`/api/red-flags/organization/${orgId}/flags/${ruleId}/override`, { justification });
+      await apiPut(`/red-flags/organization/${orgId}/flags/${ruleId}/override`, { justification });
       refetch();
     } catch {
       // Error silencioso

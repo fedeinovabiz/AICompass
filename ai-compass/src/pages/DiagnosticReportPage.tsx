@@ -264,7 +264,7 @@ export default function DiagnosticReportPage() {
     setAnalysisLoading(true);
     setAnalysisError(null);
     try {
-      const result = await apiPost<CrossSessionAnalysis>('/api/ai/cross-analysis', {
+      const result = await apiPost<CrossSessionAnalysis>('/ai/cross-analysis', {
         organizationId: orgId,
         sessionIds: [],
       });

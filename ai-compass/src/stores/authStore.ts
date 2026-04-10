@@ -33,7 +33,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   login: async (email: string, password: string) => {
     set({ isLoading: true, error: null });
     try {
-      const response = await apiPost<LoginResponse>('/api/auth/login', { email, password });
+      const response = await apiPost<LoginResponse>('/auth/login', { email, password });
       localStorage.setItem(TOKEN_KEY, response.token);
       set({ token: response.token, user: response.user, isLoading: false });
     } catch (err) {
@@ -54,7 +54,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 
     set({ isLoading: true });
     try {
-      const user = await apiGet<User>('/api/auth/me');
+      const user = await apiGet<User>('/auth/me');
       set({ user, isLoading: false });
     } catch {
       // Si falla, limpiar sesión

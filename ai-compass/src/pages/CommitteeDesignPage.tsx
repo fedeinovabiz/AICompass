@@ -179,7 +179,7 @@ export default function CommitteeDesignPage() {
 
     void fetchCommittee(orgId);
 
-    apiGet<CrossSessionAnalysis>(`/api/organizations/${orgId}/cross-analysis`)
+    apiGet<CrossSessionAnalysis>(`/organizations/${orgId}/cross-analysis`)
       .then((analysis) => {
         setRecommendation(analysis.committeeRecommendation);
       })

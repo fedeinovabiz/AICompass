@@ -38,7 +38,7 @@ export function useRedFlags(orgId: string | undefined): UseRedFlagsResult {
     setIsLoading(true);
     setError(null);
 
-    apiGet<ActiveRedFlag[]>(`/api/red-flags/organization/${orgId}`)
+    apiGet<ActiveRedFlag[]>(`/red-flags/organization/${orgId}`)
       .then((data) => {
         if (activo) {
           setRedFlags(data);

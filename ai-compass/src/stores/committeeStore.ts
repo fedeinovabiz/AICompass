@@ -28,7 +28,7 @@ export const useCommitteeStore = create<CommitteeState>((set, get) => ({
   fetchCommittee: async (orgId: string) => {
     set({ isLoading: true, error: null });
     try {
-      const committee = await apiGet<Committee>(`/api/organizations/${orgId}/committee`);
+      const committee = await apiGet<Committee>(`/organizations/${orgId}/committee`);
       set({ committee, isLoading: false });
     } catch (err) {
       const message = err instanceof Error ? err.message : 'Error al cargar el comité';
@@ -40,7 +40,7 @@ export const useCommitteeStore = create<CommitteeState>((set, get) => ({
     set({ isLoading: true, error: null });
     try {
       const committee = await apiPost<Committee>(
-        `/api/organizations/${orgId}/committee`,
+        `/organizations/${orgId}/committee`,
         { meetingCadence },
       );
       set({ committee, isLoading: false });
@@ -58,7 +58,7 @@ export const useCommitteeStore = create<CommitteeState>((set, get) => ({
     set({ isLoading: true, error: null });
     try {
       const updated = await apiPost<Committee>(
-        `/api/organizations/${committee.organizationId}/committee/members`,
+        `/organizations/${committee.organizationId}/committee/members`,
         member,
       );
       set({ committee: updated, isLoading: false });
@@ -76,7 +76,7 @@ export const useCommitteeStore = create<CommitteeState>((set, get) => ({
     set({ isLoading: true, error: null });
     try {
       const updated = await apiDel<Committee>(
-        `/api/organizations/${committee.organizationId}/committee/members/${id}`,
+        `/organizations/${committee.organizationId}/committee/members/${id}`,
       );
       set({ committee: updated, isLoading: false });
     } catch (err) {
@@ -93,7 +93,7 @@ export const useCommitteeStore = create<CommitteeState>((set, get) => ({
     set({ isLoading: true, error: null });
     try {
       const updated = await apiPut<Committee>(
-        `/api/organizations/${committee.organizationId}/committee/decisions/${number}`,
+        `/organizations/${committee.organizationId}/committee/decisions/${number}`,
         { response },
       );
       set({ committee: updated, isLoading: false });
@@ -108,7 +108,7 @@ export const useCommitteeStore = create<CommitteeState>((set, get) => ({
     set({ isLoading: true, error: null });
     try {
       const updated = await apiPost<Committee>(
-        `/api/organizations/${orgId}/committee/constitute`,
+        `/organizations/${orgId}/committee/constitute`,
         {},
       );
       set({ committee: updated, isLoading: false });

@@ -55,7 +55,7 @@ export const usePilotStore = create<PilotState>((set) => ({
   fetchPilots: async (orgId: string) => {
     set({ isLoading: true, error: null });
     try {
-      const pilots = await apiGet<Pilot[]>(`/api/organizations/${orgId}/pilots`);
+      const pilots = await apiGet<Pilot[]>(`/organizations/${orgId}/pilots`);
       set({ pilots, isLoading: false });
     } catch (err) {
       const message = err instanceof Error ? err.message : 'Error al cargar pilotos';
@@ -66,7 +66,7 @@ export const usePilotStore = create<PilotState>((set) => ({
   fetchPilot: async (id: string) => {
     set({ isLoading: true, error: null });
     try {
-      const pilot = await apiGet<Pilot>(`/api/pilots/${id}`);
+      const pilot = await apiGet<Pilot>(`/pilots/${id}`);
       set({ currentPilot: pilot, isLoading: false });
     } catch (err) {
       const message = err instanceof Error ? err.message : 'Error al cargar piloto';
@@ -77,7 +77,7 @@ export const usePilotStore = create<PilotState>((set) => ({
   createPilot: async (orgId: string, data: CreatePilotData) => {
     set({ isLoading: true, error: null });
     try {
-      const pilot = await apiPost<Pilot>(`/api/organizations/${orgId}/pilots`, data);
+      const pilot = await apiPost<Pilot>(`/organizations/${orgId}/pilots`, data);
       set((state) => ({ pilots: [...state.pilots, pilot], isLoading: false }));
       return pilot;
     } catch (err) {
@@ -90,7 +90,7 @@ export const usePilotStore = create<PilotState>((set) => ({
   updatePilot: async (id: string, data: UpdatePilotData) => {
     set({ isLoading: true, error: null });
     try {
-      const updated = await apiPut<Pilot>(`/api/pilots/${id}`, data);
+      const updated = await apiPut<Pilot>(`/pilots/${id}`, data);
       set((state) => ({
         pilots: state.pilots.map((p) => (p.id === id ? updated : p)),
         currentPilot: state.currentPilot?.id === id ? updated : state.currentPilot,
@@ -106,7 +106,7 @@ export const usePilotStore = create<PilotState>((set) => ({
   updateStatus: async (id: string, status: PilotStatus) => {
     set({ isLoading: true, error: null });
     try {
-      const updated = await apiPut<Pilot>(`/api/pilots/${id}/status`, { status });
+      const updated = await apiPut<Pilot>(`/pilots/${id}/status`, { status });
       set((state) => ({
         pilots: state.pilots.map((p) => (p.id === id ? updated : p)),
         currentPilot: state.currentPilot?.id === id ? updated : state.currentPilot,
@@ -122,7 +122,7 @@ export const usePilotStore = create<PilotState>((set) => ({
   addMetricEntry: async (id: string, entry: PilotMetricEntry) => {
     set({ isLoading: true, error: null });
     try {
-      const updated = await apiPost<Pilot>(`/api/pilots/${id}/metrics`, entry);
+      const updated = await apiPost<Pilot>(`/pilots/${id}/metrics`, entry);
       set((state) => ({
         pilots: state.pilots.map((p) => (p.id === id ? updated : p)),
         currentPilot: state.currentPilot?.id === id ? updated : state.currentPilot,
@@ -138,7 +138,7 @@ export const usePilotStore = create<PilotState>((set) => ({
   setBaseline: async (id: string, metrics: Pilot['baseline']) => {
     set({ isLoading: true, error: null });
     try {
-      const updated = await apiPut<Pilot>(`/api/pilots/${id}/baseline`, { baseline: metrics });
+      const updated = await apiPut<Pilot>(`/pilots/${id}/baseline`, { baseline: metrics });
       set((state) => ({
         pilots: state.pilots.map((p) => (p.id === id ? updated : p)),
         currentPilot: state.currentPilot?.id === id ? updated : state.currentPilot,
@@ -154,7 +154,7 @@ export const usePilotStore = create<PilotState>((set) => ({
   setCommitteeDecision: async (id: string, decision: string, justification: string) => {
     set({ isLoading: true, error: null });
     try {
-      const updated = await apiPut<Pilot>(`/api/pilots/${id}/committee-decision`, {
+      const updated = await apiPut<Pilot>(`/pilots/${id}/committee-decision`, {
         decision,
         justification,
       });
