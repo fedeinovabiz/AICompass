@@ -31,9 +31,9 @@ router.get('/organization/:orgId', async (req, res, next) => {
     // Cargar sesiones con participantes
     const sesiones = await getMany<{
       id: string;
-      session_type: string;
+      type: string;
       status: string;
-    }>('SELECT id, session_type, status FROM sessions WHERE engagement_id IN (SELECT id FROM engagements WHERE organization_id = $1)', [orgId]);
+    }>('SELECT id, type, status FROM sessions WHERE engagement_id IN (SELECT id FROM engagements WHERE organization_id = $1)', [orgId]);
 
     const sesionesConParticipantes = await Promise.all(
       sesiones.map(async (s) => {
@@ -42,7 +42,7 @@ router.get('/organization/:orgId', async (req, res, next) => {
           [s.id],
         );
         return {
-          type: s.session_type,
+          type: s.type,
           status: s.status,
           participants: participantes,
         };
@@ -59,8 +59,8 @@ router.get('/organization/:orgId', async (req, res, next) => {
     if (committee) {
       const [members, decisions, meetings] = await Promise.all([
         getMany<{ role: string }>('SELECT role FROM committee_members WHERE committee_id = $1', [committee.id]),
-        getMany<{ response: string }>('SELECT COALESCE(answer, \'\') as response FROM committee_decisions WHERE committee_id = $1', [committee.id]),
-        getMany<{ attendees: string[] }>('SELECT COALESCE(attendees, \'[]\')::jsonb as attendees FROM committee_meetings WHERE committee_id = $1 ORDER BY meeting_date DESC', [committee.id]),
+        getMany<{ response: string }>('SELECT COALESCE(response, \'\') as response FROM foundational_decisions WHERE committee_id = $1', [committee.id]),
+        getMany<{ attendees: string[] }>('SELECT COALESCE(attendees, \'[]\'::jsonb) as attendees FROM committee_meetings WHERE committee_id = $1 ORDER BY date DESC', [committee.id]),
       ]);
       committeeData = { members, decisions, meetings };
     }
