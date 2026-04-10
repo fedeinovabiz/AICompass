@@ -2,14 +2,23 @@
 // COUNCIL DASHBOARD PAGE — Vista de solo lectura para miembros del AI Council (F-013)
 // ══════════════════════════════════════════════
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useAuthStore } from '@/stores/authStore';
 import { useOrganizationStore } from '@/stores/organizationStore';
 import { usePilotStore } from '@/stores/pilotStore';
 import { useCommitteeStore } from '@/stores/committeeStore';
 import { useRedFlags } from '@/hooks/useRedFlags';
+import { apiGet } from '@/services/apiClient';
 import SpiderChart from '@/components/SpiderChart';
-import type { Pilot, FoundationalDecision } from '@/types';
+import type { Pilot, FoundationalDecision, DimensionKey } from '@/types';
+
+interface BenchmarkResponse {
+  industry: string;
+  sizeCategory: string;
+  scores: Partial<Record<DimensionKey, number>>;
+  sampleSize: number;
+  source: string;
+}
 
 // ── Helpers de formato ────────────────────────────────────────────────────────
 
@@ -109,6 +118,7 @@ export default function CouncilDashboardPage() {
   const { pilots, fetchPilots, isLoading: pilotsLoading } = usePilotStore();
   const { committee, fetchCommittee, isLoading: committeeLoading } = useCommitteeStore();
   const { redFlags, isLoading: redFlagsLoading } = useRedFlags(orgId);
+  const [benchmark, setBenchmark] = useState<BenchmarkResponse | null>(null);
 
   useEffect(() => {
     if (!orgId) return;
@@ -116,6 +126,14 @@ export default function CouncilDashboardPage() {
     void fetchPilots(orgId);
     void fetchCommittee(orgId);
   }, [orgId, fetchOrganization, fetchPilots, fetchCommittee]);
+
+  useEffect(() => {
+    if (!currentOrganization) return;
+    const { industry, size } = currentOrganization;
+    apiGet<BenchmarkResponse>(`/benchmarks?industry=${encodeURIComponent(industry)}&size=${encodeURIComponent(size)}`)
+      .then((data) => setBenchmark(data))
+      .catch(() => { /* benchmark opcional */ });
+  }, [currentOrganization]);
 
   const isLoading = orgLoading || pilotsLoading || committeeLoading || redFlagsLoading;
 
@@ -159,7 +177,14 @@ export default function CouncilDashboardPage() {
         <section>
           <h2 className="text-lg font-semibold text-white mb-4">Madurez por dimensión</h2>
           <div className="bg-slate-800 rounded-xl p-4 border border-slate-700">
-            <SpiderChart scores={org.maturityScores} />
+            <SpiderChart scores={org.maturityScores} benchmark={benchmark?.scores} />
+            {benchmark && (
+              <p className="text-slate-500 text-xs mt-2 text-center">
+                {benchmark.source === 'framework'
+                  ? `Benchmark basado en frameworks de referencia — ${org.industry} (${benchmark.sizeCategory} empleados)`
+                  : `Comparado con ${benchmark.sampleSize} empresa${benchmark.sampleSize !== 1 ? 's' : ''} de ${benchmark.industry} (${benchmark.sizeCategory} empleados)`}
+              </p>
+            )}
           </div>
         </section>
       )}

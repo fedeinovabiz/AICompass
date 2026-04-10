@@ -6,7 +6,7 @@ import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { useOrganizationStore } from '@/stores/organizationStore';
 import { useAuthStore } from '@/stores/authStore';
-import { apiPost } from '@/services/apiClient';
+import { apiPost, apiGet } from '@/services/apiClient';
 import type {
   DimensionKey,
   CrossSessionAnalysis,
@@ -235,6 +235,16 @@ function DeepDiveCard({ dd }: { dd: DeepDiveRecommendation }) {
   );
 }
 
+// ── Tipo de respuesta del benchmark ──────────
+
+interface BenchmarkResponse {
+  industry: string;
+  sizeCategory: string;
+  scores: Partial<Record<DimensionKey, number>>;
+  sampleSize: number;
+  source: string;
+}
+
 // ── Página principal ──────────────────────────
 
 export default function DiagnosticReportPage() {
@@ -246,6 +256,7 @@ export default function DiagnosticReportPage() {
   const [analysisLoading, setAnalysisLoading] = useState(false);
   const [analysisError, setAnalysisError] = useState<string | null>(null);
   const [published, setPublished] = useState(false);
+  const [benchmark, setBenchmark] = useState<BenchmarkResponse | null>(null);
 
   const isFacilitator = user?.role === 'facilitator' || user?.role === 'admin';
   const isCouncil = user?.role === 'council';
@@ -258,6 +269,14 @@ export default function DiagnosticReportPage() {
       void fetchOrganization(orgId);
     }
   }, [orgId, fetchOrganization]);
+
+  useEffect(() => {
+    if (!currentOrganization) return;
+    const { industry, size } = currentOrganization;
+    apiGet<BenchmarkResponse>(`/benchmarks?industry=${encodeURIComponent(industry)}&size=${encodeURIComponent(size)}`)
+      .then((data) => setBenchmark(data))
+      .catch(() => { /* benchmark opcional, no bloquear la página */ });
+  }, [currentOrganization]);
 
   async function handleGenerarAnalisis() {
     if (!orgId) return;
@@ -352,7 +371,14 @@ export default function DiagnosticReportPage() {
       {/* Spider Chart */}
       <div className="bg-slate-800 rounded-xl border border-slate-700 p-6">
         <h2 className="text-white font-semibold text-base mb-4">Mapa de Madurez</h2>
-        <SpiderChart scores={maturityScores} />
+        <SpiderChart scores={maturityScores} benchmark={benchmark?.scores} />
+        {benchmark && (
+          <p className="text-slate-400 text-xs mt-3 text-center">
+            {benchmark.source === 'framework'
+              ? `Benchmark basado en frameworks de referencia — ${currentOrganization.industry} (${benchmark.sizeCategory} empleados)`
+              : `Comparado con ${benchmark.sampleSize} empresa${benchmark.sampleSize !== 1 ? 's' : ''} de ${benchmark.industry} (${benchmark.sizeCategory} empleados)`}
+          </p>
+        )}
       </div>
 
       {/* Paneles por dimensión */}
@@ -415,6 +441,19 @@ export default function DiagnosticReportPage() {
               className="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white text-sm font-medium rounded-lg transition-colors"
             >
               Descargar Reporte
+            </button>
+          )}
+
+          {Object.keys(maturityScores).length > 0 && (
+            <button
+              onClick={() =>
+                window.open(
+                  `${import.meta.env.VITE_API_URL}/presentations/organization/${orgId}/diagnostic.pptx`,
+                )
+              }
+              className="px-5 py-2.5 bg-violet-600 hover:bg-violet-500 text-white text-sm font-medium rounded-lg transition-colors"
+            >
+              Descargar PPTX
             </button>
           )}
 

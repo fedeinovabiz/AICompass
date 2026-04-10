@@ -11,6 +11,14 @@ import StageMap from '@/components/StageMap';
 import SpiderChart from '@/components/SpiderChart';
 import type { DimensionKey, Engagement, CrossSessionAnalysis } from '@/types';
 
+interface BenchmarkResponse {
+  industry: string;
+  sizeCategory: string;
+  scores: Partial<Record<DimensionKey, number>>;
+  sampleSize: number;
+  source: string;
+}
+
 const DIMENSION_LABELS: Record<DimensionKey, string> = {
   estrategia: 'Estrategia',
   procesos: 'Procesos',
@@ -79,6 +87,7 @@ export default function MaturityMapPage() {
   const { sessions, fetchSessions } = useSessionStore();
   const [, setEngagementId] = useState<string | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [benchmark, setBenchmark] = useState<BenchmarkResponse | null>(null);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -96,6 +105,14 @@ export default function MaturityMapPage() {
       })
       .catch(() => { /* sin engagement */ });
   }, [orgId, fetchOrganization, fetchSessions, currentOrganization]);
+
+  useEffect(() => {
+    if (!currentOrganization) return;
+    const { industry, size } = currentOrganization;
+    apiGet<BenchmarkResponse>(`/benchmarks?industry=${encodeURIComponent(industry)}&size=${encodeURIComponent(size)}`)
+      .then((data) => setBenchmark(data))
+      .catch(() => { /* benchmark opcional */ });
+  }, [currentOrganization]);
 
   if (isLoading && !currentOrganization) {
     return <div className="p-8 text-gray-400 text-center">Cargando...</div>;
@@ -137,7 +154,14 @@ export default function MaturityMapPage() {
 
         {showScores ? (
           <>
-            <SpiderChart scores={scores} />
+            <SpiderChart scores={scores} benchmark={benchmark?.scores} />
+            {benchmark && (
+              <p className="text-gray-500 text-xs mt-2 text-center">
+                {benchmark.source === 'framework'
+                  ? `Benchmark basado en frameworks de referencia — ${currentOrganization.industry} (${benchmark.sizeCategory} empleados)`
+                  : `Comparado con ${benchmark.sampleSize} empresa${benchmark.sampleSize !== 1 ? 's' : ''} de ${benchmark.industry} (${benchmark.sizeCategory} empleados)`}
+              </p>
+            )}
             <MaturityScoreBars scores={scores} />
           </>
         ) : (

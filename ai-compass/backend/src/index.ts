@@ -12,6 +12,8 @@ import pilotRoutes from './routes/pilots';
 import aiRoutes from './routes/ai';
 import redFlagRoutes from './routes/redFlags';
 import reportRoutes from './routes/reports';
+import benchmarkRoutes from './routes/benchmarks';
+import presentationRoutes from './routes/presentations';
 
 const app = express();
 
@@ -32,6 +34,8 @@ app.use('/api/pilots', pilotRoutes);
 app.use('/api/ai', aiRoutes);
 app.use('/api/red-flags', redFlagRoutes);
 app.use('/api/reports', reportRoutes);
+app.use('/api/benchmarks', benchmarkRoutes);
+app.use('/api/presentations', presentationRoutes);
 
 app.use(errorHandler);
 

@@ -55,6 +55,7 @@ export default function Layout() {
                   <NavItem to={`/org/${orgId}/diagnostic`} label="Diagnóstico" />
                   <NavItem to={`/org/${orgId}/committee/design`} label="Comité" />
                   <NavItem to={`/org/${orgId}/pilots`} label="Pilotos" />
+                  <NavItem to={`/org/${orgId}/scaling`} label="Escalamiento" />
                   <NavItem to={`/org/${orgId}/reports`} label="Reportes" />
                 </>
               )}

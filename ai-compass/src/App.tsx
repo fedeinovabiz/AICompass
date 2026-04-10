@@ -16,6 +16,8 @@ import PilotListPage from './pages/PilotListPage';
 import PilotDetailPage from './pages/PilotDetailPage';
 import ReportBuilderPage from './pages/ReportBuilderPage';
 import CouncilDashboardPage from './pages/CouncilDashboardPage';
+import ScalingDashboardPage from './pages/ScalingDashboardPage';
+import ScalingPlanDetailPage from './pages/ScalingPlanDetailPage';
 import { useAuthStore } from './stores/authStore';
 
 export default function App() {
@@ -44,6 +46,9 @@ export default function App() {
           <Route path="/org/:orgId/committee/constitution" element={<CommitteeConstitutionPage />} />
           <Route path="/org/:orgId/pilots" element={<PilotListPage />} />
           <Route path="/org/:orgId/pilots/:pilotId" element={<PilotDetailPage />} />
+          {/* F-014a — Dashboard de Escalamiento */}
+          <Route path="/org/:orgId/scaling" element={<ScalingDashboardPage />} />
+          <Route path="/org/:orgId/scaling/:planId" element={<ScalingPlanDetailPage />} />
           {/* F-012 — Report Builder */}
           <Route path="/org/:orgId/reports" element={<ReportBuilderPage />} />
         </Route>

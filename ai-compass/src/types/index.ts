@@ -379,6 +379,49 @@ export interface CrossSessionAnalysis {
 }
 
 // ══════════════════════════════════════════════
+// ESCALAMIENTO (ETAPA 4)
+// ══════════════════════════════════════════════
+
+export type ScalingStatus = 'planning' | 'active' | 'completed' | 'paused';
+
+export interface TargetArea {
+  name: string;
+  teamSize: number;
+  targetDate?: string;
+  status: 'planned' | 'in-progress' | 'completed' | 'paused';
+}
+
+export interface ScalingMetric {
+  id: string;
+  scalingPlanId: string;
+  areaName: string;
+  date: string;
+  adoptionPercentage: number | null;
+  usersActive: number | null;
+  impactMetrics: Record<string, unknown>;
+  notes: string | null;
+  createdAt: string;
+}
+
+export interface ScalingPlan {
+  id: string;
+  pilotId: string;
+  organizationId: string;
+  targetAreas: TargetArea[];
+  totalTargetUsers: number;
+  scalingStartDate: string | null;
+  scalingStatus: ScalingStatus;
+  createdAt: string;
+  updatedAt: string;
+  // Campos del JOIN con pilots
+  pilotName: string;
+  pilotTool: string;
+  committeeDecision: string | null;
+  // Solo en detalle
+  metrics?: ScalingMetric[];
+}
+
+// ══════════════════════════════════════════════
 // PATRONES DE FRACASO
 // ══════════════════════════════════════════════
 
