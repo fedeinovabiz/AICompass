@@ -36,8 +36,8 @@ router.get('/:id', async (req, res, next) => {
     }
 
     const [participants, questions, findings] = await Promise.all([
-      getMany('SELECT * FROM session_participants WHERE session_id = $1 ORDER BY created_at', [req.params.id]),
-      getMany('SELECT * FROM session_questions WHERE session_id = $1 ORDER BY created_at', [req.params.id]),
+      getMany('SELECT * FROM session_participants WHERE session_id = $1', [req.params.id]),
+      getMany('SELECT * FROM session_questions WHERE session_id = $1 ORDER BY question_id', [req.params.id]),
       getMany('SELECT * FROM emergent_findings WHERE session_id = $1 ORDER BY created_at', [req.params.id]),
     ]);
 

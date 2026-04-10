@@ -21,9 +21,9 @@ router.get('/organization/:orgId', async (req, res, next) => {
 
     const committeeId = (committee as { id: string }).id;
     const [members, decisions, meetings] = await Promise.all([
-      getMany('SELECT * FROM committee_members WHERE committee_id = $1 ORDER BY created_at', [committeeId]),
-      getMany('SELECT * FROM committee_decisions WHERE committee_id = $1 ORDER BY decision_number', [committeeId]),
-      getMany('SELECT * FROM committee_meetings WHERE committee_id = $1 ORDER BY meeting_date DESC', [committeeId]),
+      getMany('SELECT * FROM committee_members WHERE committee_id = $1', [committeeId]),
+      getMany('SELECT * FROM foundational_decisions WHERE committee_id = $1 ORDER BY number', [committeeId]),
+      getMany('SELECT * FROM committee_meetings WHERE committee_id = $1 ORDER BY date DESC', [committeeId]),
     ]);
 
     res.json({ ...committee as object, members, decisions, meetings });

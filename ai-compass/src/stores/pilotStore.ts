@@ -55,7 +55,7 @@ export const usePilotStore = create<PilotState>((set) => ({
   fetchPilots: async (orgId: string) => {
     set({ isLoading: true, error: null });
     try {
-      const pilots = await apiGet<Pilot[]>(`/organizations/${orgId}/pilots`);
+      const pilots = await apiGet<Pilot[]>(`/pilots/organization/${orgId}`);
       set({ pilots, isLoading: false });
     } catch (err) {
       const message = err instanceof Error ? err.message : 'Error al cargar pilotos';
@@ -74,10 +74,10 @@ export const usePilotStore = create<PilotState>((set) => ({
     }
   },
 
-  createPilot: async (orgId: string, data: CreatePilotData) => {
+  createPilot: async (_orgId: string, data: CreatePilotData) => {
     set({ isLoading: true, error: null });
     try {
-      const pilot = await apiPost<Pilot>(`/organizations/${orgId}/pilots`, data);
+      const pilot = await apiPost<Pilot>(`/pilots`, data);
       set((state) => ({ pilots: [...state.pilots, pilot], isLoading: false }));
       return pilot;
     } catch (err) {
