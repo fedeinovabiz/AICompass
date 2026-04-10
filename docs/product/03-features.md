@@ -116,25 +116,67 @@
 
 ---
 
-## Won't-Have (fuera de alcance MVP)
+## Fase 2 — Should-Have (post-MVP, ahora planificados)
 
-### F-014: Etapas 4-5 (Escalamiento y Transformación AI-First)
-### F-015: Generación de PPTX avanzado
+### F-014a: Dashboard de escalamiento (Etapa 4)
+
+- **Origen**: Etapa 4 del journey — "Escalar lo exitoso"
+- **Descripción**: Cuando un piloto se aprueba para escalar (decisión del comité = "scale"), el facilitador necesita trackear el rollout a más equipos/áreas. Dashboard con: pilotos aprobados para escalar, áreas/equipos target, métricas de adopción a escala (no solo el equipo piloto original), decisiones go/no-go por área, timeline de rollout.
+- **Complejidad técnica**: M
+- **Valor para usuario**: H
+- **Tiempo estimado**: M (1-2 sem)
+
+### F-014b: Herramienta de rediseño de procesos (Etapa 4)
+
+- **Origen**: Etapa 4 del journey — "Rediseñar flujos"
+- **Descripción**: Herramienta para mapear procesos end-to-end de la organización y evaluar candidatos a automatización con IA. El facilitador usa los hallazgos del diagnóstico y los resultados de pilotos para identificar más procesos. Para cada proceso: mapeo visual (pasos, actores, tiempo, herramientas), clasificación por nivel de implementación (prompting/no-code/custom), estimación de impacto, priorización con matriz impacto-esfuerzo. La IA sugiere procesos candidatos basándose en los dolores documentados.
+- **Complejidad técnica**: H
+- **Valor para usuario**: H
+- **Tiempo estimado**: M (1-2 sem)
+
+### F-014c: Dashboard de transformación (Etapa 5)
+
+- **Origen**: Etapa 5 del journey — "Transformación AI-First"
+- **Descripción**: Vista consolidada del estado de transformación de la organización. KPIs acumulados: total de procesos rediseñados, horas liberadas acumuladas, ROI consolidado de todos los pilotos, evolución del spider chart en el tiempo (comparar scores de hoy vs primer diagnóstico). Catálogo de herramientas IA adoptadas (inventario: herramienta, licencias, equipos que la usan, costo mensual). Evolución de las 8 decisiones fundacionales (¿cambiaron? ¿hay nuevas decisiones?). Gobernanza adaptativa: estado de cumplimiento de políticas.
+- **Complejidad técnica**: M
+- **Valor para usuario**: M
+- **Tiempo estimado**: M (1-2 sem)
+
+### F-015: Generar presentación PPTX del diagnóstico
+
+- **Origen**: Entregable de Etapa 2 — Presentación Final (deck ejecutivo para sesión presencial)
+- **Descripción**: Generar un archivo PPTX profesional con branding InovaBiz a partir del diagnóstico completado. El deck sigue la estructura de 15 slides de la spec: (1) Portada con logos, (2) Contexto, (3) Metodología, (4) Spider Chart, (5-10) Una slide por dimensión con hallazgo + evidencia + nivel, (11) Brechas críticas, (12) Mapa de personas (Champions/resistencias), (13) Roadmap de madurez, (14) Quick Wins recomendados, (15) Próximos pasos. Branding: colores corporativos InovaBiz, tipografía Inter/sistema, layouts profesionales diferenciados por tipo de slide. El facilitador puede descargar el PPTX y editarlo antes de presentar.
+- **Complejidad técnica**: H
+- **Valor para usuario**: H
+- **Tiempo estimado**: M (1-2 sem)
+
+### F-018: Benchmark de madurez por industria
+
+- **Origen**: Spider Chart del diagnóstico — línea de comparación
+- **Descripción**: Superponer en el Spider Chart una línea punteada de "benchmark de industria" que muestre el promedio de organizaciones similares. Fuente inicial: datos hardcodeados basados en frameworks de referencia (McKinsey State of AI: madurez RAI promedio 2.3/4, Microsoft: 40-50% en nivel 100). A medida que InovaBiz acumula diagnósticos de clientes reales, los datos se enriquecen automáticamente (cada diagnóstico completado alimenta el benchmark anonimizado). Granularidad: por industria + tamaño de empresa. El facilitador ve "su cliente vs el promedio de empresas de Tecnología de 50-200 empleados". Genera flywheel de valor: más clientes → mejor benchmark → más valor → más clientes.
+- **Complejidad técnica**: M
+- **Valor para usuario**: H
+- **Tiempo estimado**: M (1-2 sem)
+
+---
+
+## Won't-Have (fuera de alcance actual)
+
 ### F-016: Notificaciones push/email
 ### F-017: Multi-idioma
-### F-018: Benchmark real por industria (requiere datos de múltiples clientes)
 ### F-019: Integración con herramientas del cliente (Salesforce, Slack, etc.)
 
 ---
 
 ## Métricas de validación
 
-- Must-Have: 6 features = 33% del total (dentro del límite 30%)
-- Should-Have: 4 features
-- Could-Have: 3 features
-- Won't-Have: 6 features
+- Must-Have (MVP): 6 features (F-001 a F-006) — implementados
+- Should-Have (MVP): 4 features (F-007 a F-010) — implementados
+- Could-Have (MVP): 3 features (F-011 a F-013) — implementados
+- Should-Have (Fase 2): 5 features (F-014a, F-014b, F-014c, F-015, F-018) — planificados
+- Won't-Have: 3 features
 - Ningún feature individual > 2 semanas
 
 ---
 
-*Generado el 2026-04-10. Producto de InovaBiz.*
+*Generado el 2026-04-10. Actualizado el 2026-04-10 con Fase 2 (F-014, F-015, F-018). Producto de InovaBiz.*
