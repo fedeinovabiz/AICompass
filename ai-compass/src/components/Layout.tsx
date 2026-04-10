@@ -27,6 +27,8 @@ export default function Layout() {
   const { user, logout } = useAuthStore();
   const { orgId } = useParams<{ orgId?: string }>();
 
+  const isCouncil = user?.role === 'council';
+
   return (
     <div className="flex min-h-screen bg-slate-900">
       {/* Sidebar */}
@@ -36,14 +38,26 @@ export default function Layout() {
         </div>
 
         <nav className="flex-1 p-4 space-y-1">
-          <NavItem to="/dashboard" label="Dashboard" />
-          {orgId && (
+          {isCouncil ? (
             <>
-              <NavItem to={`/org/${orgId}`} label="Organización" />
-              <NavItem to={`/org/${orgId}/sessions`} label="Sesiones" />
-              <NavItem to={`/org/${orgId}/diagnostic`} label="Diagnóstico" />
-              <NavItem to={`/org/${orgId}/committee/design`} label="Comité" />
-              <NavItem to={`/org/${orgId}/pilots`} label="Pilotos" />
+              <NavItem to="/council" label="Mi organización" />
+              {orgId && (
+                <NavItem to={`/org/${orgId}/reports`} label="Reportes" />
+              )}
+            </>
+          ) : (
+            <>
+              <NavItem to="/dashboard" label="Dashboard" />
+              {orgId && (
+                <>
+                  <NavItem to={`/org/${orgId}`} label="Organización" />
+                  <NavItem to={`/org/${orgId}/sessions`} label="Sesiones" />
+                  <NavItem to={`/org/${orgId}/diagnostic`} label="Diagnóstico" />
+                  <NavItem to={`/org/${orgId}/committee/design`} label="Comité" />
+                  <NavItem to={`/org/${orgId}/pilots`} label="Pilotos" />
+                  <NavItem to={`/org/${orgId}/reports`} label="Reportes" />
+                </>
+              )}
             </>
           )}
         </nav>

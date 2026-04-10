@@ -14,6 +14,8 @@ import TranscriptReviewPage from './pages/TranscriptReviewPage';
 import MaturityMapPage from './pages/MaturityMapPage';
 import PilotListPage from './pages/PilotListPage';
 import PilotDetailPage from './pages/PilotDetailPage';
+import ReportBuilderPage from './pages/ReportBuilderPage';
+import CouncilDashboardPage from './pages/CouncilDashboardPage';
 import { useAuthStore } from './stores/authStore';
 
 export default function App() {
@@ -42,6 +44,14 @@ export default function App() {
           <Route path="/org/:orgId/committee/constitution" element={<CommitteeConstitutionPage />} />
           <Route path="/org/:orgId/pilots" element={<PilotListPage />} />
           <Route path="/org/:orgId/pilots/:pilotId" element={<PilotDetailPage />} />
+          {/* F-012 — Report Builder */}
+          <Route path="/org/:orgId/reports" element={<ReportBuilderPage />} />
+        </Route>
+      </Route>
+      {/* F-013 — Council Dashboard (acceso restringido a rol council) */}
+      <Route element={<ProtectedRoute allowedRoles={['council']} />}>
+        <Route element={<Layout />}>
+          <Route path="/council" element={<CouncilDashboardPage />} />
         </Route>
       </Route>
     </Routes>

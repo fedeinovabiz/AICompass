@@ -404,6 +404,20 @@ export default function DiagnosticReportPage() {
             {analysisLoading ? 'Generando análisis...' : 'Generar análisis cross-sesión'}
           </button>
 
+          {Object.keys(maturityScores).length > 0 && (
+            <button
+              onClick={() =>
+                window.open(
+                  `${import.meta.env.VITE_API_URL}/reports/organization/${orgId}/diagnostic-report`,
+                  '_blank',
+                )
+              }
+              className="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white text-sm font-medium rounded-lg transition-colors"
+            >
+              Descargar Reporte
+            </button>
+          )}
+
           {!published && (
             <button
               onClick={handlePublicar}

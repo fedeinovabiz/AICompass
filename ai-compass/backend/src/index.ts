@@ -11,6 +11,7 @@ import committeeRoutes from './routes/committees';
 import pilotRoutes from './routes/pilots';
 import aiRoutes from './routes/ai';
 import redFlagRoutes from './routes/redFlags';
+import reportRoutes from './routes/reports';
 
 const app = express();
 
@@ -30,6 +31,7 @@ app.use('/api/committees', committeeRoutes);
 app.use('/api/pilots', pilotRoutes);
 app.use('/api/ai', aiRoutes);
 app.use('/api/red-flags', redFlagRoutes);
+app.use('/api/reports', reportRoutes);
 
 app.use(errorHandler);
 
