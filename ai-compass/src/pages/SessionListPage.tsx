@@ -6,7 +6,8 @@ import { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useSessionStore } from '@/stores/sessionStore';
 import { useOrganizationStore } from '@/stores/organizationStore';
-import type { Session } from '@/types';
+import { apiGet } from '@/services/apiClient';
+import type { Session, Engagement } from '@/types';
 
 const SESSION_TYPE_LABELS: Record<string, string> = {
   ejecutiva: 'Ejecutiva',
@@ -65,21 +66,31 @@ export default function SessionListPage() {
   const { currentOrganization, fetchOrganization } = useOrganizationStore();
   const [showSelector, setShowSelector] = useState(false);
   const [isCreating, setIsCreating] = useState(false);
+  const [engagementId, setEngagementId] = useState<string | null>(null);
 
   useEffect(() => {
     if (!orgId) return;
-    void fetchSessions(orgId);
     if (!currentOrganization || currentOrganization.id !== orgId) {
       void fetchOrganization(orgId);
     }
+    // Obtener el engagement activo de la organización
+    apiGet<Engagement[]>(`/engagements/organization/${orgId}`)
+      .then((engagements) => {
+        const active = engagements.find((e) => e.status === 'active') ?? engagements[0];
+        if (active) {
+          setEngagementId(active.id);
+          void fetchSessions(active.id);
+        }
+      })
+      .catch(() => { /* sin engagement aún */ });
   }, [orgId, fetchSessions, fetchOrganization, currentOrganization]);
 
   async function handleCreateSession(type: NewSessionType) {
-    if (!orgId) return;
+    if (!engagementId) return;
     setIsCreating(true);
     try {
       await createSession({
-        engagementId: orgId,
+        engagementId,
         type,
         modality: 'presencial',
         title: `Sesión ${SESSION_TYPE_LABELS[type]} — ${new Date().toLocaleDateString('es-AR')}`,
@@ -181,10 +192,10 @@ export default function SessionListPage() {
                   </div>
                   <p className="text-sm font-medium text-white">{session.title}</p>
                   <p className="text-xs text-gray-500">
-                    {session.participants.length} participante(s)
-                    {session.scheduledDate && ` · ${session.scheduledDate}`}
-                    {session.questions.length > 0 &&
-                      ` · ${session.questions.filter((q) => q.validationStatus !== 'pending').length}/${session.questions.length} validadas`}
+                    {(session.participants ?? []).length} participante(s)
+                    {session.scheduledDate && ` · ${new Date(session.scheduledDate).toLocaleDateString('es-AR')}`}
+                    {(session.questions ?? []).length > 0 &&
+                      ` · ${(session.questions ?? []).filter((q) => q.validationStatus !== 'pending').length}/${(session.questions ?? []).length} validadas`}
                   </p>
                 </div>
                 <span className="text-gray-600 text-sm">→</span>
