@@ -1,0 +1,239 @@
+// ══════════════════════════════════════════════
+// SESSION STORE — Gestión de sesiones de diagnóstico
+// ══════════════════════════════════════════════
+
+import { create } from 'zustand';
+import { apiGet, apiPost, apiPut } from '@/services/apiClient';
+import type { Session, Participant, ValidationStatus } from '@/types';
+
+interface CreateSessionData {
+  engagementId: string;
+  type: Session['type'];
+  modality: Session['modality'];
+  title: string;
+  scheduledDate?: string;
+}
+
+interface UpdateSessionData {
+  title?: string;
+  notes?: string;
+  status?: Session['status'];
+  modality?: Session['modality'];
+  scheduledDate?: string;
+}
+
+interface UpdateQuestionAnswerData {
+  validationStatus?: ValidationStatus;
+  editedAnswer?: string;
+  manualAnswer?: string;
+  finalAnswer?: string;
+}
+
+interface SessionState {
+  sessions: Session[];
+  currentSession: Session | null;
+  isLoading: boolean;
+  isProcessingAI: boolean;
+  error: string | null;
+
+  fetchSessions: (engagementId: string) => Promise<void>;
+  fetchSession: (id: string) => Promise<void>;
+  createSession: (data: CreateSessionData) => Promise<Session>;
+  updateSession: (id: string, data: UpdateSessionData) => Promise<void>;
+  updateQuestionAnswer: (sessionId: string, questionId: string, data: UpdateQuestionAnswerData) => Promise<void>;
+  addParticipant: (sessionId: string, p: Omit<Participant, 'id'>) => Promise<void>;
+  removeParticipant: (sessionId: string, pid: string) => Promise<void>;
+  processWithAI: (sessionId: string) => Promise<void>;
+  uploadTranscript: (sessionId: string, file: File) => Promise<void>;
+  uploadTranscriptText: (sessionId: string, text: string) => Promise<void>;
+  clearCurrentSession: () => void;
+}
+
+export const useSessionStore = create<SessionState>((set, get) => ({
+  sessions: [],
+  currentSession: null,
+  isLoading: false,
+  isProcessingAI: false,
+  error: null,
+
+  fetchSessions: async (engagementId: string) => {
+    set({ isLoading: true, error: null });
+    try {
+      const sessions = await apiGet<Session[]>(`/api/engagements/${engagementId}/sessions`);
+      set({ sessions, isLoading: false });
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Error al cargar sesiones';
+      set({ error: message, isLoading: false });
+    }
+  },
+
+  fetchSession: async (id: string) => {
+    set({ isLoading: true, error: null });
+    try {
+      const session = await apiGet<Session>(`/api/sessions/${id}`);
+      set({ currentSession: session, isLoading: false });
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Error al cargar sesión';
+      set({ error: message, isLoading: false });
+    }
+  },
+
+  createSession: async (data: CreateSessionData) => {
+    set({ isLoading: true, error: null });
+    try {
+      const session = await apiPost<Session>('/api/sessions', data);
+      set((state) => ({
+        sessions: [...state.sessions, session],
+        isLoading: false,
+      }));
+      return session;
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Error al crear sesión';
+      set({ error: message, isLoading: false });
+      throw err;
+    }
+  },
+
+  updateSession: async (id: string, data: UpdateSessionData) => {
+    set({ isLoading: true, error: null });
+    try {
+      const updated = await apiPut<Session>(`/api/sessions/${id}`, data);
+      set((state) => ({
+        sessions: state.sessions.map((s) => (s.id === id ? updated : s)),
+        currentSession: state.currentSession?.id === id ? updated : state.currentSession,
+        isLoading: false,
+      }));
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Error al actualizar sesión';
+      set({ error: message, isLoading: false });
+      throw err;
+    }
+  },
+
+  updateQuestionAnswer: async (sessionId: string, questionId: string, data: UpdateQuestionAnswerData) => {
+    try {
+      const updated = await apiPut<Session>(
+        `/api/sessions/${sessionId}/questions/${questionId}`,
+        data,
+      );
+      set((state) => ({
+        sessions: state.sessions.map((s) => (s.id === sessionId ? updated : s)),
+        currentSession: state.currentSession?.id === sessionId ? updated : state.currentSession,
+      }));
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Error al actualizar respuesta';
+      set({ error: message });
+      throw err;
+    }
+  },
+
+  addParticipant: async (sessionId: string, p: Omit<Participant, 'id'>) => {
+    try {
+      const updated = await apiPost<Session>(`/api/sessions/${sessionId}/participants`, p);
+      set((state) => ({
+        sessions: state.sessions.map((s) => (s.id === sessionId ? updated : s)),
+        currentSession: state.currentSession?.id === sessionId ? updated : state.currentSession,
+      }));
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Error al agregar participante';
+      set({ error: message });
+      throw err;
+    }
+  },
+
+  removeParticipant: async (sessionId: string, pid: string) => {
+    // Optimistic update
+    const prevSession = get().currentSession;
+    if (prevSession?.id === sessionId) {
+      set((state) => ({
+        currentSession: state.currentSession
+          ? {
+              ...state.currentSession,
+              participants: state.currentSession.participants.filter((p) => p.id !== pid),
+            }
+          : null,
+      }));
+    }
+    try {
+      await apiPut<Session>(`/api/sessions/${sessionId}/participants/${pid}/remove`, {});
+    } catch (err) {
+      // Revertir optimistic update
+      if (prevSession) set({ currentSession: prevSession });
+      const message = err instanceof Error ? err.message : 'Error al eliminar participante';
+      set({ error: message });
+      throw err;
+    }
+  },
+
+  processWithAI: async (sessionId: string) => {
+    set({ isProcessingAI: true, error: null });
+    try {
+      const updated = await apiPost<Session>(`/api/sessions/${sessionId}/process-ai`, {
+        sessionId,
+        includeTranscript: true,
+        includeNotes: true,
+      });
+      set((state) => ({
+        sessions: state.sessions.map((s) => (s.id === sessionId ? updated : s)),
+        currentSession: state.currentSession?.id === sessionId ? updated : state.currentSession,
+        isProcessingAI: false,
+      }));
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Error al procesar con IA';
+      set({ error: message, isProcessingAI: false });
+      throw err;
+    }
+  },
+
+  uploadTranscript: async (sessionId: string, file: File) => {
+    set({ isLoading: true, error: null });
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+
+      const token = localStorage.getItem('token');
+      const BASE_URL = import.meta.env.VITE_API_URL ?? '';
+      const response = await fetch(`${BASE_URL}/api/sessions/${sessionId}/transcript`, {
+        method: 'POST',
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
+        body: formData,
+      });
+
+      if (!response.ok) {
+        const errorBody = await response.json().catch(() => ({ message: response.statusText }));
+        throw new Error((errorBody as { message?: string }).message ?? `Error ${response.status}`);
+      }
+
+      const updated: Session = await response.json() as Session;
+      set((state) => ({
+        sessions: state.sessions.map((s) => (s.id === sessionId ? updated : s)),
+        currentSession: state.currentSession?.id === sessionId ? updated : state.currentSession,
+        isLoading: false,
+      }));
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Error al subir transcripción';
+      set({ error: message, isLoading: false });
+      throw err;
+    }
+  },
+
+  uploadTranscriptText: async (sessionId: string, text: string) => {
+    set({ isLoading: true, error: null });
+    try {
+      const updated = await apiPut<Session>(`/api/sessions/${sessionId}/transcript-text`, { text });
+      set((state) => ({
+        sessions: state.sessions.map((s) => (s.id === sessionId ? updated : s)),
+        currentSession: state.currentSession?.id === sessionId ? updated : state.currentSession,
+        isLoading: false,
+      }));
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Error al guardar texto de transcripción';
+      set({ error: message, isLoading: false });
+      throw err;
+    }
+  },
+
+  clearCurrentSession: () => {
+    set({ currentSession: null, error: null });
+  },
+}));

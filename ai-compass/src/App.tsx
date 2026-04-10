@@ -4,6 +4,16 @@ import Layout from './components/Layout';
 import ProtectedRoute from './components/ProtectedRoute';
 import LoginPage from './pages/LoginPage';
 import DashboardPage from './pages/DashboardPage';
+import DiagnosticReportPage from './pages/DiagnosticReportPage';
+import CommitteeDesignPage from './pages/CommitteeDesignPage';
+import CommitteeConstitutionPage from './pages/CommitteeConstitutionPage';
+import OrganizationPage from './pages/OrganizationPage';
+import SessionListPage from './pages/SessionListPage';
+import SessionViewPage from './pages/SessionViewPage';
+import TranscriptReviewPage from './pages/TranscriptReviewPage';
+import MaturityMapPage from './pages/MaturityMapPage';
+import PilotListPage from './pages/PilotListPage';
+import PilotDetailPage from './pages/PilotDetailPage';
 import { useAuthStore } from './stores/authStore';
 
 export default function App() {
@@ -20,17 +30,18 @@ export default function App() {
         <Route element={<Layout />}>
           <Route path="/dashboard" element={<DashboardPage />} />
           <Route path="/" element={<Navigate to="/dashboard" replace />} />
-          {/* Stubs — M09-M12 reemplazan estos */}
-          <Route path="/org/:orgId" element={<div className="p-8 text-white">Organización (pendiente M09)</div>} />
-          <Route path="/org/:orgId/sessions" element={<div className="p-8 text-white">Sesiones (pendiente M09)</div>} />
-          <Route path="/org/:orgId/sessions/:sessionId" element={<div className="p-8 text-white">Sesión (pendiente M09)</div>} />
-          <Route path="/org/:orgId/sessions/:sessionId/review" element={<div className="p-8 text-white">Revisión (pendiente M09)</div>} />
-          <Route path="/org/:orgId/maturity" element={<div className="p-8 text-white">Mapa de madurez (pendiente M11)</div>} />
-          <Route path="/org/:orgId/diagnostic" element={<div className="p-8 text-white">Diagnóstico (pendiente M11)</div>} />
-          <Route path="/org/:orgId/committee/design" element={<div className="p-8 text-white">Diseño comité (pendiente M10)</div>} />
-          <Route path="/org/:orgId/committee/constitution" element={<div className="p-8 text-white">Constitución (pendiente M10)</div>} />
-          <Route path="/org/:orgId/pilots" element={<div className="p-8 text-white">Pilotos (pendiente M12)</div>} />
-          <Route path="/org/:orgId/pilots/:pilotId" element={<div className="p-8 text-white">Piloto detalle (pendiente M12)</div>} />
+          {/* M09 — Módulo de sesiones */}
+          <Route path="/org/:orgId" element={<OrganizationPage />} />
+          <Route path="/org/:orgId/sessions" element={<SessionListPage />} />
+          <Route path="/org/:orgId/sessions/:sessionId" element={<SessionViewPage />} />
+          <Route path="/org/:orgId/sessions/:sessionId/review" element={<TranscriptReviewPage />} />
+          <Route path="/org/:orgId/maturity" element={<MaturityMapPage />} />
+          {/* M10 — Diagnóstico y comité */}
+          <Route path="/org/:orgId/diagnostic" element={<DiagnosticReportPage />} />
+          <Route path="/org/:orgId/committee/design" element={<CommitteeDesignPage />} />
+          <Route path="/org/:orgId/committee/constitution" element={<CommitteeConstitutionPage />} />
+          <Route path="/org/:orgId/pilots" element={<PilotListPage />} />
+          <Route path="/org/:orgId/pilots/:pilotId" element={<PilotDetailPage />} />
         </Route>
       </Route>
     </Routes>
