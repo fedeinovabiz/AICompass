@@ -10,7 +10,7 @@ router.use(authMiddleware);
 router.get('/organization/:orgId', async (req, res, next) => {
   try {
     const plans = await getMany(
-      `SELECT sp.*, p.name AS pilot_name, p.tool AS pilot_tool, p.committee_decision
+      `SELECT sp.*, p.title AS pilot_name, p.tool AS pilot_tool, p.committee_decision
        FROM scaling_plans sp
        JOIN pilots p ON sp.pilot_id = p.id
        WHERE sp.organization_id = $1
@@ -27,7 +27,7 @@ router.get('/organization/:orgId', async (req, res, next) => {
 router.get('/:id', async (req, res, next) => {
   try {
     const plan = await getOne(
-      `SELECT sp.*, p.name AS pilot_name, p.tool AS pilot_tool, p.committee_decision
+      `SELECT sp.*, p.title AS pilot_name, p.tool AS pilot_tool, p.committee_decision
        FROM scaling_plans sp
        JOIN pilots p ON sp.pilot_id = p.id
        WHERE sp.id = $1`,
