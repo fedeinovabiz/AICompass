@@ -12,7 +12,7 @@ router.get('/engagement/:engagementId', async (req, res, next) => {
     const sessions = await getMany(
       `SELECT s.*,
          COUNT(sq.id) AS question_count,
-         COUNT(sq.id) FILTER (WHERE sq.validated = true) AS validated_count
+         COUNT(sq.id) FILTER (WHERE sq.validation_status IN ('approved', 'edited')) AS validated_count
        FROM sessions s
        LEFT JOIN session_questions sq ON sq.session_id = s.id
        WHERE s.engagement_id = $1
@@ -37,8 +37,8 @@ router.get('/:id', async (req, res, next) => {
 
     const [participants, questions, findings] = await Promise.all([
       getMany('SELECT * FROM session_participants WHERE session_id = $1 ORDER BY created_at', [req.params.id]),
-      getMany('SELECT * FROM session_questions WHERE session_id = $1 ORDER BY question_order', [req.params.id]),
-      getMany('SELECT * FROM session_findings WHERE session_id = $1 ORDER BY created_at', [req.params.id]),
+      getMany('SELECT * FROM session_questions WHERE session_id = $1 ORDER BY created_at', [req.params.id]),
+      getMany('SELECT * FROM emergent_findings WHERE session_id = $1 ORDER BY created_at', [req.params.id]),
     ]);
 
     res.json({ ...session as object, participants, questions, findings });
@@ -50,29 +50,28 @@ router.get('/:id', async (req, res, next) => {
 // POST / — Crear sesión e insertar preguntas del catálogo
 router.post('/', async (req, res, next) => {
   try {
-    const { engagementId, sessionType, scheduledDate, notes } = req.body;
-    if (!engagementId || !sessionType) {
-      res.status(400).json({ message: 'Los campos engagementId y sessionType son requeridos', code: 'VALIDATION_ERROR' });
+    const { engagementId, type, modality, title, scheduledDate, notes } = req.body;
+    if (!engagementId || !type || !modality || !title) {
+      res.status(400).json({ message: 'Los campos engagementId, type, modality y title son requeridos', code: 'VALIDATION_ERROR' });
       return;
     }
 
     const sessionResult = await query(
-      `INSERT INTO sessions (engagement_id, session_type, scheduled_date, notes, status)
-       VALUES ($1, $2, $3, $4, 'pending')
+      `INSERT INTO sessions (engagement_id, type, modality, title, scheduled_date, notes, status)
+       VALUES ($1, $2, $3, $4, $5, $6, 'draft')
        RETURNING *`,
-      [engagementId, sessionType, scheduledDate ?? null, notes ?? null],
+      [engagementId, type, modality, title, scheduledDate ?? null, notes ?? null],
     );
 
     const session = sessionResult.rows[0];
 
     // Insertar preguntas del catálogo para este tipo de sesión
-    const questions = getQuestionsForSession(sessionType);
-    for (let i = 0; i < questions.length; i++) {
-      const q = questions[i];
+    const questions = getQuestionsForSession(type);
+    for (const q of questions) {
       await query(
-        `INSERT INTO session_questions (session_id, question_id, question_text, dimension, weight, question_order)
-         VALUES ($1, $2, $3, $4, $5, $6)`,
-        [session.id, q.id, q.text, q.dimension, q.weight, i + 1],
+        `INSERT INTO session_questions (session_id, question_id, dimension, question_text)
+         VALUES ($1, $2, $3, $4)`,
+        [session.id, q.id, q.dimension, q.text],
       );
     }
 
@@ -114,7 +113,7 @@ router.put('/:id', async (req, res, next) => {
 // PUT /:sessionId/questions/:questionId — Actualizar respuesta/validación de una pregunta
 router.put('/:sessionId/questions/:questionId', async (req, res, next) => {
   try {
-    const { answer, validated, score, notes } = req.body;
+    const { validationStatus, editedAnswer, manualAnswer, finalAnswer } = req.body;
     const { sessionId, questionId } = req.params;
 
     const existing = await getOne(
@@ -128,14 +127,14 @@ router.put('/:sessionId/questions/:questionId', async (req, res, next) => {
 
     const result = await query(
       `UPDATE session_questions SET
-         answer = COALESCE($1, answer),
-         validated = COALESCE($2, validated),
-         score = COALESCE($3, score),
-         notes = COALESCE($4, notes),
+         validation_status = COALESCE($1, validation_status),
+         edited_answer = COALESCE($2, edited_answer),
+         manual_answer = COALESCE($3, manual_answer),
+         final_answer = COALESCE($4, final_answer),
          updated_at = NOW()
        WHERE session_id = $5 AND id = $6
        RETURNING *`,
-      [answer ?? null, validated ?? null, score ?? null, notes ?? null, sessionId, questionId],
+      [validationStatus ?? null, editedAnswer ?? null, manualAnswer ?? null, finalAnswer ?? null, sessionId, questionId],
     );
 
     res.json(result.rows[0]);
@@ -147,9 +146,9 @@ router.put('/:sessionId/questions/:questionId', async (req, res, next) => {
 // POST /:id/participants — Agregar participante
 router.post('/:id/participants', async (req, res, next) => {
   try {
-    const { name, role, email } = req.body;
-    if (!name) {
-      res.status(400).json({ message: 'El campo name es requerido', code: 'VALIDATION_ERROR' });
+    const { name, role, area } = req.body;
+    if (!name || !role || !area) {
+      res.status(400).json({ message: 'Los campos name, role y area son requeridos', code: 'VALIDATION_ERROR' });
       return;
     }
 
@@ -160,10 +159,10 @@ router.post('/:id/participants', async (req, res, next) => {
     }
 
     const result = await query(
-      `INSERT INTO session_participants (session_id, name, role, email)
+      `INSERT INTO session_participants (session_id, name, role, area)
        VALUES ($1, $2, $3, $4)
        RETURNING *`,
-      [req.params.id, name, role ?? null, email ?? null],
+      [req.params.id, name, role, area],
     );
 
     res.status(201).json(result.rows[0]);

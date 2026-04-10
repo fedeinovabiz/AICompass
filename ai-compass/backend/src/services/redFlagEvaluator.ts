@@ -135,17 +135,17 @@ function evaluarRF_SponsorAusente(state: OrgState): boolean {
 type Evaluador = (state: OrgState) => boolean;
 
 const EVALUADORES: Record<string, Evaluador> = {
-  RF01: evaluarRF01,
-  RF02: evaluarRF02,
-  RF03: evaluarRF03,
-  RF05: evaluarRF05,
-  RF06: evaluarRF06,
-  RF07: evaluarRF07,
-  RF08: evaluarRF08,
-  RF09: evaluarRF09,
-  RF09_ADOPCION: evaluarRF10,
-  RF10: evaluarRF11,
-  RF11: evaluarRF_SponsorAusente,
+  RF01: evaluarRF01,       // Sin sponsor ejecutivo identificado
+  RF02: evaluarRF02,       // Datos en silos (placeholder - depende de IA)
+  RF03: evaluarRF03,       // Alta resistencia cultural (5+ dimensiones en 1)
+  // RF04: sin evaluador automatico (procesos no documentados - requiere revision manual)
+  RF05: evaluarRF05,       // Comite no constituido (sin operational-leader)
+  RF06: evaluarRF06,       // Decisiones fundacionales sin consenso
+  RF07: evaluarRF07,       // Champion sin tiempo dedicado (>7 miembros como proxy)
+  RF08: evaluarRF08,       // Sin metricas baseline antes del piloto
+  RF09: evaluarRF10,       // Adopcion del piloto por debajo del 30%
+  RF10: evaluarRF09,       // Piloto sin decision del comite al cumplir plazo
+  RF11: evaluarRF_SponsorAusente, // Comite sin reuniones por mas de 30 dias
 };
 
 export function evaluateRedFlags(orgState: OrgState): ActiveRedFlag[] {
