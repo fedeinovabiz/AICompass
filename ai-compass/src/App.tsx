@@ -18,6 +18,9 @@ import ReportBuilderPage from './pages/ReportBuilderPage';
 import CouncilDashboardPage from './pages/CouncilDashboardPage';
 import ScalingDashboardPage from './pages/ScalingDashboardPage';
 import ScalingPlanDetailPage from './pages/ScalingPlanDetailPage';
+import TransformationDashboardPage from './pages/TransformationDashboardPage';
+import ProcessMapListPage from './pages/ProcessMapListPage';
+import ProcessMapDetailPage from './pages/ProcessMapDetailPage';
 import { useAuthStore } from './stores/authStore';
 
 export default function App() {
@@ -49,6 +52,11 @@ export default function App() {
           {/* F-014a — Dashboard de Escalamiento */}
           <Route path="/org/:orgId/scaling" element={<ScalingDashboardPage />} />
           <Route path="/org/:orgId/scaling/:planId" element={<ScalingPlanDetailPage />} />
+          {/* F-014b — Mapeo de procesos */}
+          <Route path="/org/:orgId/processes" element={<ProcessMapListPage />} />
+          <Route path="/org/:orgId/processes/:processId" element={<ProcessMapDetailPage />} />
+          {/* F-014c — Dashboard de Transformación */}
+          <Route path="/org/:orgId/transformation" element={<TransformationDashboardPage />} />
           {/* F-012 — Report Builder */}
           <Route path="/org/:orgId/reports" element={<ReportBuilderPage />} />
         </Route>

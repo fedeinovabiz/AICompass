@@ -422,6 +422,80 @@ export interface ScalingPlan {
 }
 
 // ══════════════════════════════════════════════
+// TRANSFORMACIÓN (ETAPA 5)
+// ══════════════════════════════════════════════
+
+export type AiToolCategory = 'llm' | 'no-code' | 'custom' | 'analytics' | 'other';
+export type AiToolStatus = 'active' | 'evaluating' | 'deprecated';
+
+export interface AiTool {
+  id: string;
+  organizationId: string;
+  name: string;
+  category: AiToolCategory;
+  licenses: number;
+  monthlyCost: number;
+  teamsUsing: string[];
+  status: AiToolStatus;
+  addedAt: string;
+}
+
+export interface GovernanceEvolution {
+  id: string;
+  organizationId: string;
+  originalDecisionNumber: number;
+  evolutionDate: string;
+  changeDescription: string;
+  decidedBy: string | null;
+  createdAt: string;
+}
+
+export interface MaturityEvolution {
+  first: Record<string, { score: number }> | null;
+  current: Record<string, { score: number }> | null;
+}
+
+export interface TransformationSummary {
+  totalProcessesRedesigned: number;
+  hoursFreed: number;
+  estimatedRoi: number;
+  aiToolsAdopted: number;
+  maturityEvolution: MaturityEvolution;
+}
+
+// ══════════════════════════════════════════════
+// MAPEO DE PROCESOS (ETAPA 4)
+// ══════════════════════════════════════════════
+
+export interface ProcessStep {
+  order: number;
+  description: string;
+  actor: string;
+  tool: string;
+  timeMinutes: number;
+  isManual: boolean;
+  aiCandidate: boolean;
+  aiAction?: string;
+}
+
+export interface ProcessMap {
+  id: string;
+  organizationId: string;
+  name: string;
+  description: string;
+  valueChainSegment: ValueChainSegment;
+  currentSteps: ProcessStep[];
+  redesignedSteps: ProcessStep[];
+  implementationLevel: ImplementationLevel;
+  estimatedHoursSavedWeekly: number;
+  estimatedImpact: string;
+  priorityScore: number;
+  status: 'mapped' | 'analyzed' | 'redesigned' | 'approved' | 'implementing';
+  createdAt: string;
+  updatedAt: string;
+}
+
+// ══════════════════════════════════════════════
 // PATRONES DE FRACASO
 // ══════════════════════════════════════════════
 

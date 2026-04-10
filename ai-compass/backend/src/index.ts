@@ -14,6 +14,8 @@ import redFlagRoutes from './routes/redFlags';
 import reportRoutes from './routes/reports';
 import benchmarkRoutes from './routes/benchmarks';
 import presentationRoutes from './routes/presentations';
+import transformationRoutes from './routes/transformation';
+import processRoutes from './routes/processes';
 
 const app = express();
 
@@ -36,6 +38,8 @@ app.use('/api/red-flags', redFlagRoutes);
 app.use('/api/reports', reportRoutes);
 app.use('/api/benchmarks', benchmarkRoutes);
 app.use('/api/presentations', presentationRoutes);
+app.use('/api/transformation', transformationRoutes);
+app.use('/api/processes', processRoutes);
 
 app.use(errorHandler);
 
