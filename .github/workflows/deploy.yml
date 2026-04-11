@@ -1,0 +1,218 @@
+name: Azure PaaS Deployment
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'ai-compass/**'
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Ambiente a deployar'
+        required: true
+        default: 'dev'
+        type: choice
+        options: [dev, qa, prod]
+
+env:
+  NODE_VERSION: '20'
+
+jobs:
+  # ============== BUILD BACKEND ==============
+  build-backend:
+    name: Build Backend
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          cache-dependency-path: ai-compass/backend/package-lock.json
+
+      - name: Install dependencies
+        working-directory: ai-compass/backend
+        run: npm ci
+
+      - name: TypeScript check
+        working-directory: ai-compass/backend
+        run: npx tsc --noEmit
+
+      - name: Build
+        working-directory: ai-compass/backend
+        run: npm run build
+
+      - name: Verify critical files
+        working-directory: ai-compass/backend
+        run: |
+          echo "Verificando archivos criticos..."
+          test -d dist && echo "  dist/ OK" || (echo "FAIL: dist/ no existe" && exit 1)
+          test -f dist/index.js && echo "  dist/index.js OK" || (echo "FAIL: dist/index.js no existe" && exit 1)
+          test -f package.json && echo "  package.json OK" || (echo "FAIL: package.json no existe" && exit 1)
+          echo "Verificacion completa"
+
+      - name: Prepare deployment package
+        working-directory: ai-compass/backend
+        run: |
+          # Instalar solo dependencias de produccion en carpeta limpia
+          mkdir -p deploy
+          cp -r dist deploy/
+          cp package.json deploy/
+          cp package-lock.json deploy/
+          cd deploy
+          npm ci --omit=dev
+          # Crear ZIP atomico
+          zip -r ../backend-deploy.zip . -x "*.ts" "*.map"
+          echo "Package size: $(du -h ../backend-deploy.zip | cut -f1)"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: backend-package
+          path: ai-compass/backend/backend-deploy.zip
+          retention-days: 1
+
+  # ============== BUILD FRONTEND ==============
+  build-frontend:
+    name: Build Frontend
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          cache-dependency-path: ai-compass/package-lock.json
+
+      - name: Install dependencies
+        working-directory: ai-compass
+        run: npm ci
+
+      - name: TypeScript check
+        working-directory: ai-compass
+        run: npx tsc --noEmit
+
+      - name: Build
+        working-directory: ai-compass
+        env:
+          VITE_API_URL: /api
+        run: npm run build
+
+      - name: Verify build output
+        working-directory: ai-compass
+        run: |
+          test -d dist && echo "dist/ OK" || (echo "FAIL" && exit 1)
+          test -f dist/index.html && echo "index.html OK" || (echo "FAIL" && exit 1)
+          echo "Build size: $(du -sh dist | cut -f1)"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: frontend-package
+          path: ai-compass/dist
+          retention-days: 1
+
+  # ============== DEPLOY BACKEND ==============
+  deploy-backend:
+    name: Deploy Backend
+    needs: [build-backend]
+    runs-on: ubuntu-latest
+    environment: ${{ github.event.inputs.environment || 'dev' }}
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: backend-package
+          path: .
+
+      - name: Azure Login
+        uses: azure/login@v2
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Deploy to App Service
+        run: |
+          az webapp deploy \
+            --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} \
+            --name ${{ secrets.AZURE_BACKEND_APP_NAME }} \
+            --type zip \
+            --src-path backend-deploy.zip \
+            --async true \
+            --timeout 600
+
+      - name: Wait for stabilization
+        run: sleep 30
+
+      - name: Health check
+        run: |
+          BACKEND_URL="https://${{ secrets.AZURE_BACKEND_APP_NAME }}.azurewebsites.net"
+          echo "Checking health at $BACKEND_URL/api/health"
+          MAX_RETRIES=10
+          for i in $(seq 1 $MAX_RETRIES); do
+            STATUS=$(curl -s -o /dev/null -w "%{http_code}" "$BACKEND_URL/api/health" || echo "000")
+            if [ "$STATUS" = "200" ]; then
+              echo "Health check PASS (attempt $i)"
+              BODY=$(curl -s "$BACKEND_URL/api/health")
+              echo "Response: $BODY"
+              exit 0
+            fi
+            echo "Attempt $i/$MAX_RETRIES: HTTP $STATUS — waiting 10s..."
+            sleep 10
+          done
+          echo "Health check FAILED after $MAX_RETRIES attempts"
+          exit 1
+
+  # ============== DEPLOY FRONTEND ==============
+  deploy-frontend:
+    name: Deploy Frontend
+    needs: [build-frontend]
+    runs-on: ubuntu-latest
+    environment: ${{ github.event.inputs.environment || 'dev' }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: frontend-package
+          path: ai-compass/dist
+
+      - name: Deploy to Static Web App
+        uses: Azure/static-web-apps-deploy@v1
+        with:
+          azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN }}
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          action: upload
+          app_location: ai-compass
+          output_location: dist
+          skip_app_build: true
+
+  # ============== POST-DEPLOY VALIDATION ==============
+  validate:
+    name: Post-Deploy Validation
+    needs: [deploy-backend, deploy-frontend]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Validate Backend
+        run: |
+          BACKEND_URL="https://${{ secrets.AZURE_BACKEND_APP_NAME }}.azurewebsites.net"
+          echo "=== Backend Health ==="
+          curl -sf "$BACKEND_URL/api/health" | jq .
+          echo ""
+          echo "=== Backend Auth (login test) ==="
+          RESPONSE=$(curl -s -o /dev/null -w "%{http_code}" -X POST "$BACKEND_URL/api/auth/login" \
+            -H "Content-Type: application/json" \
+            -d '{"email":"test@test.com","password":"wrong"}')
+          echo "Login with wrong credentials: HTTP $RESPONSE (expected 401)"
+          if [ "$RESPONSE" != "401" ]; then
+            echo "WARNING: Expected 401 but got $RESPONSE"
+          fi
+
+      - name: Summary
+        run: |
+          echo "## Deployment Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Component | URL | Status |" >> $GITHUB_STEP_SUMMARY
+          echo "|-----------|-----|--------|" >> $GITHUB_STEP_SUMMARY
+          echo "| Backend | https://${{ secrets.AZURE_BACKEND_APP_NAME }}.azurewebsites.net | Deployed |" >> $GITHUB_STEP_SUMMARY
+          echo "| Frontend | Azure Static Web App | Deployed |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "Deployed at: $(date -u)" >> $GITHUB_STEP_SUMMARY
