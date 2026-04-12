@@ -3,8 +3,10 @@
 
 @allowed(['dev', 'qa', 'prod'])
 param environment string = 'dev'
-param location string = 'eastus2'
-@minLength(3) @maxLength(20)
+param location string = 'eastus'
+param staticWebAppLocation string = 'eastus2'
+@minLength(3)
+@maxLength(20)
 param projectName string = 'aicompass'
 @secure()
 param dbAdminPassword string
@@ -205,7 +207,7 @@ resource kvRoleAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01' =
 // ============== STATIC WEB APP (FRONTEND) ==============
 resource staticWebApp 'Microsoft.Web/staticSites@2023-12-01' = {
   name: staticWebAppName
-  location: location
+  location: staticWebAppLocation
   tags: commonTags
   sku: { name: 'Free', tier: 'Free' }
   properties: {}
