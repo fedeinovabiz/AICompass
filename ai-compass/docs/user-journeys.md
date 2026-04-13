@@ -1,20 +1,20 @@
 # User Journeys - AICompass
 
-Documentacion de todos los recorridos de usuario (journeys) de la plataforma AICompass, organizados por etapa del framework de transformacion.
+Documentación de todos los recorridos de usuario (journeys) de la plataforma AICompass, organizados por etapa del framework de transformación.
 
 ---
 
 ## Tabla de Contenidos
 
 1. [Diagrama de Dependencias](#diagrama-de-dependencias)
-2. [Journey: Autenticacion](#journey-1-autenticacion)
-3. [Journey: Gestion de Organizaciones](#journey-2-gestion-de-organizaciones)
-4. [Journey Etapa 1: Diagnostico](#journey-3-etapa-1---diagnostico)
+2. [Journey: Autenticación](#journey-1-autenticacion)
+3. [Journey: Gestión de Organizaciones](#journey-2-gestion-de-organizaciones)
+4. [Journey Etapa 1: Diagnóstico](#journey-3-etapa-1---diagnostico)
 5. [Journey Etapa 2: Descubrimiento](#journey-4-etapa-2---descubrimiento)
 6. [Journey Etapa 3: Pilotos](#journey-5-etapa-3---pilotos)
 7. [Journey Etapa 4: Escalamiento](#journey-6-etapa-4---escalamiento)
-8. [Journey Etapa 4b: Areas Departamentales](#journey-7-etapa-4b---areas-departamentales)
-9. [Journey Etapa 5: Transformacion](#journey-8-etapa-5---transformacion)
+8. [Journey Etapa 4b: Áreas Departamentales](#journey-7-etapa-4b---areas-departamentales)
+9. [Journey Etapa 5: Transformación](#journey-8-etapa-5---transformacion)
 10. [Journey: Reportes](#journey-9-reportes-y-entregables)
 11. [Journey: Council Dashboard](#journey-10-council-dashboard)
 12. [Journey: Red Flags](#journey-11-monitoreo-de-red-flags)
@@ -68,7 +68,7 @@ Organization
 
 ---
 
-## Journey 1: Autenticacion
+## Journey 1: Autenticación
 
 **Punto de entrada:** `/login`
 **Punto de salida:** `/dashboard` o `/council`
@@ -88,25 +88,25 @@ Organization
 
 ### Pasos Detallados
 
-1. El usuario abre la aplicacion y ve la pagina de login.
-2. Ingresa su email registrado y contrasena.
+1. El usuario abre la aplicación y ve la página de login.
+2. Ingresa su email registrado y contraseña.
 3. El sistema valida las credenciales contra la base de datos.
 4. Si son correctas, genera un token JWT y lo almacena.
-5. Redirige al dashboard segun el rol del usuario.
+5. Redirige al dashboard según el rol del usuario.
 6. Si las credenciales son incorrectas, muestra mensaje de error.
 
-### Proteccion de Rutas
+### Protección de Rutas
 
-- Todas las rutas (excepto `/login`) estan protegidas por `ProtectedRoute`.
-- Si el token expira, se redirige automaticamente a `/login`.
-- Algunas rutas requieren roles especificos (ej: `/council` solo para rol `council`).
+- Todas las rutas (excepto `/login`) están protegidas por `ProtectedRoute`.
+- Si el token expira, se redirige automáticamente a `/login`.
+- Algunas rutas requieren roles específicos (ej: `/council` solo para rol `council`).
 
 ---
 
-## Journey 2: Gestion de Organizaciones
+## Journey 2: Gestión de Organizaciones
 
 **Punto de entrada:** `/dashboard`
-**Punto de salida:** `/org/{orgId}` (detalle de organizacion)
+**Punto de salida:** `/org/{orgId}` (detalle de organización)
 **Valor:** Visibilidad del portfolio de clientes y acceso a iniciativas
 
 ### Flujo
@@ -126,58 +126,58 @@ Organization
 1. El facilitador accede al dashboard.
 2. Ve todas sus organizaciones como tarjetas (admin ve todas).
 3. Cada tarjeta muestra: nombre, industria, etapa actual, score, AI Operating Level.
-4. Para crear una nueva organizacion:
-   a. Clic en "Nueva Organizacion".
-   b. Completa formulario: nombre, industria, tamano, contacto.
+4. Para crear una nueva organización:
+   a. Clic en "Nueva Organización".
+   b. Completa formulario: nombre, industria, tamaño, contacto.
    c. Crea y es redirigido al detalle.
 5. Para navegar a una existente: clic en la tarjeta.
 
 ---
 
-## Journey 3: Etapa 1 - Diagnostico
+## Journey 3: Etapa 1 - Diagnóstico
 
 **Punto de entrada:** `/org/{orgId}`
-**Punto de salida:** Comite constituido + 3 sesiones validadas
-**Valor:** Diagnostico de madurez en IA + gobernanza base establecida
+**Punto de salida:** Comité constituido + 3 sesiones validadas
+**Valor:** Diagnóstico de madurez en IA + gobernanza base establecida
 
-### Sub-Journey 3.1: Vista General de Organizacion
+### Sub-Journey 3.1: Vista General de Organización
 
 ```
 [Org Detail] --> Ver StageMap (5 etapas visual)
              --> Ver StageProgress (criterios cumplidos/pendientes)
              --> Ver sesiones recientes
-             --> Navegar a acciones segun etapa
+             --> Navegar a acciones según etapa
 ```
 
 ### Sub-Journey 3.2: Crear y Ejecutar Sesiones
 
 ```
-[Session List] --> Crear nueva sesion
-               --> Seleccionar tipo (ejecutiva/operativa/tecnica/etc)
+[Session List] --> Crear nueva sesión
+               --> Seleccionar tipo (ejecutiva/operativa/técnica/etc)
                --> Seleccionar modalidad (presencial/remota)
-               --> Sistema inserta preguntas del catalogo
+               --> Sistema inserta preguntas del catálogo
                --> [Session View]:
                    --> Agregar participantes
-                   --> Subir transcripcion O escribir notas
+                   --> Subir transcripción O escribir notas
                    --> Procesar con IA
                    --> Validar respuestas sugeridas
                    --> Marcar como completada
 ```
 
-**Flujo completo de una sesion:**
+**Flujo completo de una sesión:**
 
-1. **Crear sesion**: facilitador selecciona tipo y modalidad.
-2. **Preparar sesion**: agrega participantes con nombre, rol y area.
+1. **Crear sesión**: facilitador selecciona tipo y modalidad.
+2. **Preparar sesión**: agrega participantes con nombre, rol y área.
 3. **Capturar datos** (una de dos opciones):
-   - **Opcion A**: Subir transcripcion (archivo .txt, .docx, .pdf o pegar texto).
-   - **Opcion B**: Escribir notas manualmente durante la sesion.
+   - **Opción A**: Subir transcripción (archivo .txt, .docx, .pdf o pegar texto).
+   - **Opción B**: Escribir notas manualmente durante la sesión.
 4. **Procesar con IA**: clic en "Procesar con IA".
-   - El sistema analiza la transcripcion/notas con Google Gemini.
+   - El sistema analiza la transcripción/notas con Google Gemini.
    - Genera respuestas sugeridas, niveles de madurez, confianza y citaciones.
 5. **Validar respuestas**: para cada pregunta, el facilitador:
    - Aprueba la respuesta sugerida, o
    - La edita, rechaza o marca como "no mencionada".
-6. **Completar sesion**: marca la sesion como validada.
+6. **Completar sesión**: marca la sesión como validada.
 
 ### Sub-Journey 3.3: Evaluar Madurez
 
@@ -188,28 +188,28 @@ Organization
                --> Decidir deep dives necesarios
 ```
 
-### Sub-Journey 3.4: Disenar Comite de IA
+### Sub-Journey 3.4: Diseñar Comité de IA
 
 ```
 [Committee Design] --> Ver 5 roles necesarios
                    --> Asignar miembros a cada rol
-                   --> IA sugiere miembros basandose en sesiones
+                   --> IA sugiere miembros basándose en sesiones
                    --> Guardar borrador
 ```
 
-### Sub-Journey 3.5: Constituir Comite
+### Sub-Journey 3.5: Constituir Comité
 
 ```
 [Committee Constitution] --> Responder 8 decisiones fundacionales
                          --> Progreso visible (X/8 respondidas)
-                         --> Marcar comite como "constituido"
+                         --> Marcar comité como "constituido"
                          --> Habilita avance a Etapa 2
 ```
 
 ### Criterios para Avanzar a Etapa 2
 
 - 3 sesiones validadas (al menos 1 ejecutiva + 1 operativa)
-- Comite constituido con roles obligatorios asignados
+- Comité constituido con roles obligatorios asignados
 - 8 decisiones fundacionales documentadas
 
 ---
@@ -218,13 +218,13 @@ Organization
 
 **Punto de entrada:** Etapa 1 completada
 **Punto de salida:** Quick wins identificados + deep dives completados
-**Valor:** Diagnostico completo con oportunidades priorizadas
+**Valor:** Diagnóstico completo con oportunidades priorizadas
 
-### Sub-Journey 4.1: Reporte de Diagnostico
+### Sub-Journey 4.1: Reporte de Diagnóstico
 
 ```
-[Diagnostic Report] --> Analisis cross-sesion automatico
-                    --> Scores finales por dimension
+[Diagnostic Report] --> Análisis cross-sesión automático
+                    --> Scores finales por dimensión
                     --> Brechas identificadas con evidencia
                     --> Quick wins sugeridos
                     --> Deep dives recomendados
@@ -234,12 +234,12 @@ Organization
 **Flujo detallado:**
 
 1. El sistema procesa todas las sesiones validadas con IA.
-2. Genera un analisis consolidado:
-   - Score final por dimension (1-4).
+2. Genera un análisis consolidado:
+   - Score final por dimensión (1-4).
    - Evidencia: citas directas con speaker, rol y timestamp.
    - Brechas: discrepancias entre sesiones o dimensiones.
 3. Recomienda:
-   - **Quick wins**: procesos que se pueden automatizar rapidamente.
+   - **Quick wins**: procesos que se pueden automatizar rápidamente.
    - **Deep dives**: sesiones adicionales para dimensiones en rojo.
 4. El facilitador revisa y exporta el reporte.
 
@@ -257,7 +257,7 @@ Organization
 ### Criterios para Avanzar a Etapa 3
 
 - Deep dives completados para dimensiones en rojo
-- Presentacion final de diagnostico realizada
+- Presentación final de diagnóstico realizada
 - 2-3 quick wins diseñados y priorizados
 
 ---
@@ -265,16 +265,16 @@ Organization
 ## Journey 5: Etapa 3 - Pilotos
 
 **Punto de entrada:** Etapa 2 completada
-**Punto de salida:** Al menos 1 piloto con impacto medible + decision de escalamiento
-**Valor:** Prueba de concepto validada con metricas reales
+**Punto de salida:** Al menos 1 piloto con impacto medible + decisión de escalamiento
+**Valor:** Prueba de concepto validada con métricas reales
 
-### Sub-Journey 5.1: Crear y Disenar Piloto
+### Sub-Journey 5.1: Crear y Diseñar Piloto
 
 ```
-[Pilot List] --> Crear piloto (titulo, proceso, herramienta, champion)
+[Pilot List] --> Crear piloto (título, proceso, herramienta, champion)
              --> [Pilot Detail]:
-                 --> Disenar workflow (antes vs despues)
-                 --> Definir baseline de metricas
+                 --> Diseñar workflow (antes vs después)
+                 --> Definir baseline de métricas
                  --> Asignar champions
                  --> Documentar impactos de rol
 ```
@@ -282,16 +282,16 @@ Organization
 **Flujo completo del ciclo de vida de un piloto:**
 
 1. **Crear piloto** (status: `designing`):
-   - Titulo, proceso, herramienta, champion.
-   - Maximo 5 pilotos activos simultaneamente.
+   - Título, proceso, herramienta, champion.
+   - Máximo 5 pilotos activos simultáneamente.
 
-2. **Disenar workflow**:
+2. **Diseñar workflow**:
    - Documentar flujo actual (pasos manuales).
-   - Disenar flujo con IA (pasos automatizados).
-   - Identificar puntos de validacion humana.
+   - Diseñar flujo con IA (pasos automatizados).
+   - Identificar puntos de validación humana.
 
 3. **Establecer baseline**:
-   - Definir metricas a rastrear (nombre, unidad, valor actual).
+   - Definir métricas a rastrear (nombre, unidad, valor actual).
    - Tomar snapshot inicial.
 
 4. **Asignar champions**:
@@ -299,19 +299,19 @@ Organization
    - Definir responsabilidades y canales.
 
 5. **Activar piloto** (status: `active`):
-   - Iniciar implementacion con equipo.
-   - Comenzar seguimiento de metricas.
+   - Iniciar implementación con equipo.
+   - Comenzar seguimiento de métricas.
 
-6. **Seguimiento periodico**:
-   - Registrar metricas semanales/mensuales.
-   - Monitorear adopcion (% usuarios, NPS).
+6. **Seguimiento periódico**:
+   - Registrar métricas semanales/mensuales.
+   - Monitorear adopción (% usuarios, NPS).
 
 7. **Evaluar** (status: `evaluating`):
-   - Comparar metricas actuales vs baseline.
+   - Comparar métricas actuales vs baseline.
    - Documentar impactos en roles.
 
-8. **Decision del comite**:
-   - **Escalar**: llevar a mas areas.
+8. **Decisión del comité**:
+   - **Escalar**: llevar a más áreas.
    - **Iterar**: ajustar y reevaluar.
    - **Kill**: cancelar si no hay impacto.
 
@@ -330,22 +330,22 @@ Organization
 ```
 [Red Flag Banner] --> Banner rojo visible si hay flags
                  --> Ver detalles de cada flag
-                 --> Resolver con justificacion
+                 --> Resolver con justificación
                  --> Flags "block" impiden avance de etapa
 ```
 
 ### Criterios para Avanzar a Etapa 4
 
-- 1+ piloto con impacto medible (metricas de adopcion > 0)
-- Decision de escalamiento del comite documentada
+- 1+ piloto con impacto medible (métricas de adopción > 0)
+- Decisión de escalamiento del comité documentada
 
 ---
 
 ## Journey 6: Etapa 4 - Escalamiento
 
 **Punto de entrada:** Etapa 3 completada
-**Punto de salida:** Procesos rediseñados y escalados a multiples areas
-**Valor:** Soluciones de IA operando a escala en la organizacion
+**Punto de salida:** Procesos rediseñados y escalados a múltiples áreas
+**Valor:** Soluciones de IA operando a escala en la organización
 
 ### Sub-Journey 6.1: Crear Plan de Escalamiento
 
@@ -359,24 +359,24 @@ Organization
 ### Sub-Journey 6.2: Ejecutar Escalamiento
 
 ```
-[Scaling Detail] --> Ver areas objetivo y estados
+[Scaling Detail] --> Ver áreas objetivo y estados
                 --> Activar plan (status: active)
-                --> Registrar metricas periodicas por area:
-                    --> % adopcion
+                --> Registrar métricas periódicas por área:
+                    --> % adopción
                     --> Usuarios activos
                     --> Impactos
                     --> Notas
-                --> Ver graficos de curva de adopcion
-                --> Completar plan cuando todas las areas estan activas
+                --> Ver gráficos de curva de adopción
+                --> Completar plan cuando todas las áreas están activas
 ```
 
-### Sub-Journey 6.3: Mapear y Redisenar Procesos
+### Sub-Journey 6.3: Mapear y Rediseñar Procesos
 
 ```
 [Process Map List] --> Crear mapa de proceso
                    --> [Process Detail]:
                        --> Mapear pasos actuales (ANTES)
-                       --> Disenar pasos con IA (DESPUES)
+                       --> Diseñar pasos con IA (DESPUÉS)
                        --> Estimar horas ahorradas
                        --> Calcular priority score
                        --> Cambiar status:
@@ -384,39 +384,39 @@ Organization
                        --> (Opcional) "Convertir a Piloto"
 ```
 
-**Flujo del rediseno de proceso:**
+**Flujo del rediseño de proceso:**
 
-1. **Crear mapa**: nombre, descripcion, segmento de cadena de valor.
-2. **Mapear estado actual**: agregar pasos con actor, herramienta, duracion.
+1. **Crear mapa**: nombre, descripción, segmento de cadena de valor.
+2. **Mapear estado actual**: agregar pasos con actor, herramienta, duración.
 3. **Identificar candidatos IA**: marcar pasos manuales automatizables.
-4. **Redisenar con IA**: agregar pasos nuevos con herramientas de IA.
+4. **Rediseñar con IA**: agregar pasos nuevos con herramientas de IA.
 5. **Estimar impacto**: horas ahorradas, impacto, priority score.
-6. **Aprobar**: comite aprueba el rediseno.
+6. **Aprobar**: comité aprueba el rediseño.
 7. **Implementar**: convertir a piloto o implementar directamente.
 
 ---
 
-## Journey 7: Etapa 4b - Areas Departamentales
+## Journey 7: Etapa 4b - Áreas Departamentales
 
 **Punto de entrada:** `/org/{orgId}/areas`
-**Punto de salida:** Areas con madurez evaluada individualmente
-**Valor:** Evaluacion granular por departamento sin sesiones complejas
+**Punto de salida:** Áreas con madurez evaluada individualmente
+**Valor:** Evaluación granular por departamento sin sesiones complejas
 
 ### Flujo Completo
 
 ```
-[Area List] --> Crear area (seleccionar estandar o custom)
-            --> Area hereda scores de organizacion
+[Area List] --> Crear área (seleccionar estándar o custom)
+            --> Área hereda scores de organización
             --> [Area Detail]:
                 --> Ver scores heredados
                 --> Ver AI Operating Level
                 --> (Opcional) Realizar mini-assessment:
                     --> [Mini Assessment]:
-                        --> 12 preguntas rapidas (2 por dimension)
+                        --> 12 preguntas rápidas (2 por dimensión)
                         --> Seleccionar nivel 1-4 por pregunta
                         --> Guardar
                         --> Status: inherited --> mini-assessed
-                        --> Scores actualizados para el area
+                        --> Scores actualizados para el área
 ```
 
 ### Transiciones de Estado
@@ -427,11 +427,11 @@ Area creada (inherited) --> Mini-assessment completado (mini-assessed) --> Sesio
 
 ---
 
-## Journey 8: Etapa 5 - Transformacion
+## Journey 8: Etapa 5 - Transformación
 
 **Punto de entrada:** `/org/{orgId}/transformation`
-**Punto de salida:** Organizacion operando como AI-First
-**Valor:** Vision consolidada del estado de transformacion
+**Punto de salida:** Organización operando como AI-First
+**Valor:** Visión consolidada del estado de transformación
 
 ### Flujo
 
@@ -441,14 +441,14 @@ Area creada (inherited) --> Mini-assessment completado (mini-assessed) --> Sesio
                                - Horas liberadas
                                - ROI estimado
                                - Herramientas IA activas
-                           --> Ver evolucion de madurez (antes vs ahora)
+                           --> Ver evolución de madurez (antes vs ahora)
                            --> Gestionar herramientas IA:
                                --> Agregar herramienta (nombre, categoria, costo)
                                --> Editar status (evaluating --> active --> deprecated)
                                --> Eliminar herramienta
-                           --> Registrar evolucion de gobernanza:
+                           --> Registrar evolución de gobernanza:
                                --> Cambios a decisiones fundacionales
-                               --> Quien decidio y cuando
+                               --> Quién decidió y cuándo
 ```
 
 ---
@@ -457,7 +457,7 @@ Area creada (inherited) --> Mini-assessment completado (mini-assessed) --> Sesio
 
 **Punto de entrada:** `/org/{orgId}/reports`
 **Punto de salida:** Documento publicado (HTML/PDF/PPTX)
-**Valor:** Documentacion ejecutiva profesional
+**Valor:** Documentación ejecutiva profesional
 
 ### Flujo
 

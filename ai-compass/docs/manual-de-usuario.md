@@ -6,22 +6,22 @@ Manual paso a paso de todas las funcionalidades de la plataforma AICompass.
 
 ## Tabla de Contenidos
 
-1. [Autenticacion y Acceso](#1-autenticacion-y-acceso)
+1. [Autenticación y Acceso](#1-autenticacion-y-acceso)
 2. [Dashboard de Organizaciones](#2-dashboard-de-organizaciones)
-3. [Detalle de Organizacion](#3-detalle-de-organizacion)
+3. [Detalle de Organización](#3-detalle-de-organizacion)
 4. [Sesiones de Discovery](#4-sesiones-de-discovery)
 5. [Transcripciones e IA](#5-transcripciones-e-ia)
 6. [Mapa de Madurez](#6-mapa-de-madurez)
-7. [Comite de IA](#7-comite-de-ia)
-8. [Constitucion del Comite](#8-constitucion-del-comite)
-9. [Reporte de Diagnostico](#9-reporte-de-diagnostico)
+7. [Comité de IA](#7-comite-de-ia)
+8. [Constitución del Comité](#8-constitucion-del-comite)
+9. [Reporte de Diagnóstico](#9-reporte-de-diagnostico)
 10. [Critical User Journeys (CUJ)](#10-critical-user-journeys-cuj)
 11. [Pilotos](#11-pilotos)
 12. [Value Engineering](#12-value-engineering)
 13. [Escalamiento](#13-escalamiento)
 14. [Mapeo de Procesos](#14-mapeo-de-procesos)
-15. [Areas Departamentales](#15-areas-departamentales)
-16. [Dashboard de Transformacion](#16-dashboard-de-transformacion)
+15. [Áreas Departamentales](#15-areas-departamentales)
+16. [Dashboard de Transformación](#16-dashboard-de-transformacion)
 17. [Herramientas de IA](#17-herramientas-de-ia)
 18. [Report Builder](#18-report-builder)
 19. [Council Dashboard](#19-council-dashboard)
@@ -29,30 +29,30 @@ Manual paso a paso de todas las funcionalidades de la plataforma AICompass.
 
 ---
 
-## 1. Autenticacion y Acceso
+## 1. Autenticación y Acceso
 
-### 1.1 Iniciar Sesion
+### 1.1 Iniciar Sesión
 
 **Ruta:** `/login`
 
-1. Abrir la aplicacion en el navegador.
+1. Abrir la aplicación en el navegador.
 2. Ingresar el **email** registrado.
-3. Ingresar la **contrasena** (minimo 6 caracteres).
-4. Hacer clic en **"Iniciar Sesion"**.
+3. Ingresar la **contraseña** (mínimo 6 caracteres).
+4. Hacer clic en **"Iniciar Sesión"**.
 5. El sistema valida las credenciales y redirige al Dashboard.
 
 ### 1.2 Roles de Usuario
 
-| Rol | Descripcion | Permisos |
+| Rol | Descripción | Permisos |
 |-----|-------------|----------|
 | **admin** | Administrador del sistema | Crear usuarios, ver todas las organizaciones, acceso total |
 | **facilitator** | Facilitador/Consultor | Crear organizaciones, gestionar sesiones, pilotos y reportes |
-| **council** | Consejero/Miembro del comite | Vista de solo lectura del Council Dashboard |
+| **council** | Consejero/Miembro del comité | Vista de solo lectura del Council Dashboard |
 
 ### 1.3 Registrar Nuevos Usuarios (Solo Admin)
 
 1. Solo usuarios con rol **admin** pueden registrar nuevos usuarios.
-2. Datos requeridos: email, contrasena, nombre, rol, organizacion (opcional).
+2. Datos requeridos: email, contraseña, nombre, rol, organización (opcional).
 
 ---
 
@@ -64,55 +64,55 @@ Manual paso a paso de todas las funcionalidades de la plataforma AICompass.
 
 1. Al ingresar, se muestra una lista de tarjetas con todas las organizaciones.
 2. Cada tarjeta muestra:
-   - Nombre de la organizacion
+   - Nombre de la organización
    - Industria
    - Etapa actual (1 a 5)
    - Score promedio de madurez
    - AI Operating Level
 
-### 2.2 Crear Nueva Organizacion
+### 2.2 Crear Nueva Organización
 
-1. Hacer clic en el boton **"Nueva Organizacion"**.
+1. Hacer clic en el botón **"Nueva Organización"**.
 2. Completar el formulario:
-   - **Nombre** de la organizacion
-   - **Industria** (ej: tecnologia, manufactura, servicios)
-   - **Tamano** (pequena, mediana, grande)
+   - **Nombre** de la organización
+   - **Industria** (ej: tecnología, manufactura, servicios)
+   - **Tamaño** (pequeña, mediana, grande)
    - **Nombre de contacto**
    - **Email de contacto**
 3. Hacer clic en **"Crear"**.
-4. El sistema redirige automaticamente a la pagina de detalle de la nueva organizacion.
+4. El sistema redirige automáticamente a la página de detalle de la nueva organización.
 
-### 2.3 Navegar a una Organizacion
+### 2.3 Navegar a una Organización
 
-- Hacer clic en cualquier tarjeta de organizacion para ver su detalle.
+- Hacer clic en cualquier tarjeta de organización para ver su detalle.
 
 ---
 
-## 3. Detalle de Organizacion
+## 3. Detalle de Organización
 
 **Ruta:** `/org/{orgId}`
 
 ### 3.1 Vista General
 
-1. Se muestra el **Mapa de Etapas (StageMap)**: una visualizacion de las 5 etapas del framework.
+1. Se muestra el **Mapa de Etapas (StageMap)**: una visualización de las 5 etapas del framework.
 2. Se muestra el **Progreso de Etapa (StageProgress)**: criterios cumplidos y pendientes para avanzar a la siguiente etapa.
 3. Sesiones recientes completadas.
 
-### 3.2 Acciones Disponibles (segun etapa)
+### 3.2 Acciones Disponibles (según etapa)
 
 | Etapa | Acciones Habilitadas |
 |-------|---------------------|
-| 1 - Diagnostico | Ver sesiones, ver mapa de madurez |
-| 2 - Descubrimiento | Comite, diagnostico, CUJ |
+| 1 - Diagnóstico | Ver sesiones, ver mapa de madurez |
+| 2 - Descubrimiento | Comité, diagnóstico, CUJ |
 | 3 - Pilotos | Crear y gestionar pilotos, value engineering |
 | 4 - Escalamiento | Planes de escalamiento, mapeo de procesos |
-| 5 - Transformacion | Dashboard de transformacion, herramientas IA |
+| 5 - Transformación | Dashboard de transformación, herramientas IA |
 
 ### 3.3 Criterios para Avanzar de Etapa
 
-- **Etapa 1 a 2:** 3 sesiones validadas + comite constituido + 8 decisiones fundacionales documentadas
-- **Etapa 2 a 3:** Deep dives completados + presentacion final + 2-3 quick wins disenados
-- **Etapa 3 a 4:** 1+ piloto con impacto medible + decision de escalamiento del comite
+- **Etapa 1 a 2:** 3 sesiones validadas + comité constituido + 8 decisiones fundacionales documentadas
+- **Etapa 2 a 3:** Deep dives completados + presentación final + 2-3 quick wins diseñados
+- **Etapa 3 a 4:** 1+ piloto con impacto medible + decisión de escalamiento del comité
 - **Etapa 4 a 5:** Procesos rediseñados en escala, gobernanza activa
 
 ---
@@ -123,37 +123,37 @@ Manual paso a paso de todas las funcionalidades de la plataforma AICompass.
 
 ### 4.1 Ver Lista de Sesiones
 
-1. Se muestra una lista cronologica de todas las sesiones.
-2. Cada sesion muestra: tipo, estado, fecha, cantidad de participantes.
+1. Se muestra una lista cronológica de todas las sesiones.
+2. Cada sesión muestra: tipo, estado, fecha, cantidad de participantes.
 3. Se puede filtrar por tipo y estado.
 
 ### 4.2 Crear Nueva Sesion
 
-1. Hacer clic en **"Nueva Sesion"**.
-2. Seleccionar el **tipo de sesion**:
+1. Hacer clic en **"Nueva Sesión"**.
+2. Seleccionar el **tipo de sesión**:
    - **Ejecutiva**: preguntas para liderazgo senior
    - **Operativa**: preguntas para mandos medios y operaciones
-   - **Tecnica**: preguntas para equipo de TI/tecnologia
-   - **Constitucion**: para constituir el comite de IA
-   - **Deep Dive**: sesion profunda en dimension especifica
-   - **Presentacion**: sesion de presentacion de resultados
+   - **Técnica**: preguntas para equipo de TI/tecnología
+   - **Constitución**: para constituir el comité de IA
+   - **Deep Dive**: sesión profunda en dimensión específica
+   - **Presentación**: sesión de presentación de resultados
 3. Seleccionar la **modalidad** (presencial o remota).
-4. Ingresar **titulo** y **fecha programada**.
+4. Ingresar **título** y **fecha programada**.
 5. Hacer clic en **"Crear"**.
-6. El sistema inserta automaticamente las preguntas del catalogo segun el tipo de sesion.
+6. El sistema inserta automáticamente las preguntas del catálogo según el tipo de sesión.
 
-### 4.3 Editar una Sesion
+### 4.3 Editar una Sesión
 
 **Ruta:** `/org/{orgId}/sessions/{sessionId}`
 
 1. **Agregar participantes:**
    - Hacer clic en "Agregar Participante".
-   - Ingresar nombre, rol y area.
+   - Ingresar nombre, rol y área.
    - Se pueden eliminar participantes existentes.
 
-2. **Notas de sesion:**
+2. **Notas de sesión:**
    - Escribir notas en el campo de texto.
-   - Las notas se guardan automaticamente (auto-save con debounce de 1.5 segundos).
+   - Las notas se guardan automáticamente (auto-save con debounce de 1.5 segundos).
 
 3. **Responder preguntas:**
    - Cada pregunta se muestra en una tarjeta (QuestionCard).
@@ -161,35 +161,35 @@ Manual paso a paso de todas las funcionalidades de la plataforma AICompass.
    - Las respuestas se agrupan por las 6 dimensiones de madurez.
 
 4. **Validar respuestas:**
-   - Despues de procesar con IA, cada respuesta puede marcarse como:
+   - Después de procesar con IA, cada respuesta puede marcarse como:
      - **Aprobada**: la respuesta sugerida es correcta
      - **Rechazada**: la respuesta no aplica
      - **Editada**: se modifica la respuesta sugerida
-     - **No mencionada**: el tema no se trato en la sesion
+     - **No mencionada**: el tema no se trató en la sesión
 
 ---
 
 ## 5. Transcripciones e IA
 
-### 5.1 Subir Transcripcion
+### 5.1 Subir Transcripción
 
-1. En la vista de sesion, buscar la seccion **"Transcripcion"**.
+1. En la vista de sesión, buscar la sección **"Transcripción"**.
 2. Se puede:
    - **Subir un archivo** (formatos: .txt, .docx, .pdf)
    - **Pegar texto** directamente en el campo
 3. El sistema procesa el texto y lo almacena.
 
-### 5.2 Procesar Sesion con IA
+### 5.2 Procesar Sesión con IA
 
-1. Hacer clic en el boton **"Procesar con IA"**.
-2. El sistema envia la transcripcion (o notas) al servicio de IA (Google Gemini).
+1. Hacer clic en el botón **"Procesar con IA"**.
+2. El sistema envía la transcripción (o notas) al servicio de IA (Google Gemini).
 3. La IA genera para cada pregunta:
-   - **Respuesta sugerida**: texto con la respuesta extraida
+   - **Respuesta sugerida**: texto con la respuesta extraída
    - **Nivel de madurez sugerido**: 1 a 4
    - **Confianza**: alta, media o baja
    - **Citaciones**: citas directas con speaker, rol y timestamp
 4. Las respuestas sugeridas aparecen en cada QuestionCard.
-5. El facilitador debe **validar** cada respuesta (ver seccion 4.3).
+5. El facilitador debe **validar** cada respuesta (ver sección 4.3).
 
 ---
 
@@ -199,113 +199,113 @@ Manual paso a paso de todas las funcionalidades de la plataforma AICompass.
 
 ### 6.1 Visualizar Scores
 
-1. Se muestra un **Spider Chart** (grafico radar) con las 6 dimensiones:
+1. Se muestra un **Spider Chart** (gráfico radar) con las 6 dimensiones:
    - Estrategia
    - Procesos
    - Datos
-   - Tecnologia
+   - Tecnología
    - Cultura
    - Gobernanza
-2. Cada dimension tiene un score de 1 a 4.
-3. Se comparan los scores con **benchmarks de industria** y tamano.
+2. Cada dimensión tiene un score de 1 a 4.
+3. Se comparan los scores con **benchmarks de industria** y tamaño.
 
 ### 6.2 Estados del Mapa
 
 | Estado | Significado |
 |--------|-------------|
-| Sin datos | No hay sesiones validadas aun |
+| Sin datos | No hay sesiones validadas aún |
 | Parcial | Algunas dimensiones tienen score |
 | Completo | Todas las dimensiones evaluadas |
 
 ### 6.3 Actualizar Scores
 
-- Los scores se actualizan automaticamente al validar sesiones.
-- Un admin puede editar scores manualmente (1-4) por dimension.
+- Los scores se actualizan automáticamente al validar sesiones.
+- Un admin puede editar scores manualmente (1-4) por dimensión.
 
 ---
 
-## 7. Comite de IA
+## 7. Comité de IA
 
 **Ruta:** `/org/{orgId}/committee/design`
 
-### 7.1 Disenar el Comite
+### 7.1 Diseñar el Comité
 
 1. El sistema muestra **5 roles** necesarios:
-   - **Sponsor** (obligatorio): lider ejecutivo que respalda la iniciativa
-   - **Lider Operativo** (obligatorio): responsable de ejecucion diaria
-   - **Representante de Negocio** (opcional): voz de las areas de negocio
-   - **Representante de TI** (opcional): perspectiva tecnica
-   - **Gestion del Cambio** (opcional): facilitador de adopcion
+   - **Sponsor** (obligatorio): líder ejecutivo que respalda la iniciativa
+   - **Líder Operativo** (obligatorio): responsable de ejecución diaria
+   - **Representante de Negocio** (opcional): voz de las áreas de negocio
+   - **Representante de TI** (opcional): perspectiva técnica
+   - **Gestión del Cambio** (opcional): facilitador de adopción
 
 2. Para cada rol:
    - Ingresar **nombre** del miembro
    - Ingresar **email**
-   - Ingresar **area** organizacional
+   - Ingresar **área** organizacional
 
-3. La IA puede sugerir miembros basandose en el analisis de sesiones.
+3. La IA puede sugerir miembros basándose en el análisis de sesiones.
 
 ### 7.2 Acciones
 
 - **Agregar miembro**: seleccionar rol, completar datos, guardar.
-- **Eliminar miembro**: boton de eliminar en la tarjeta del miembro.
+- **Eliminar miembro**: botón de eliminar en la tarjeta del miembro.
 - **Guardar borrador**: guarda sin marcar como constituido.
 
 ---
 
-## 8. Constitucion del Comite
+## 8. Constitución del Comité
 
 **Ruta:** `/org/{orgId}/committee/constitution`
 
 ### 8.1 Decisiones Fundacionales
 
-El comite debe responder **8 decisiones** que guian toda la transformacion:
+El comité debe responder **8 decisiones** que guían toda la transformación:
 
-| # | Decision | Descripcion |
+| # | Decisión | Descripción |
 |---|----------|-------------|
-| 1 | Definicion de IA | Que significa IA para la organizacion |
-| 2 | Scope | Cuales procesos son elegibles para IA |
+| 1 | Definición de IA | Qué significa IA para la organización |
+| 2 | Scope | Cuáles procesos son elegibles para IA |
 | 3 | Enfoque | Centralizadas vs distribuidas las iniciativas |
-| 4 | Gobernanza | Quien decide en el comite sobre que |
-| 5 | Priorizacion | Criterios para seleccionar quick wins |
-| 6 | Change Management | Modelo de adopcion del cambio |
-| 7 | ROI esperado | Targets financieros de la transformacion |
+| 4 | Gobernanza | Quién decide en el comité sobre qué |
+| 5 | Priorización | Criterios para seleccionar quick wins |
+| 6 | Change Management | Modelo de adopción del cambio |
+| 7 | ROI esperado | Targets financieros de la transformación |
 | 8 | Escalamiento | Plan post-pilotos |
 
 ### 8.2 Responder Decisiones
 
-1. Cada decision se muestra en una tarjeta (DecisionCard).
-2. Seleccionar o escribir la respuesta segun el tipo.
-3. Al guardar, se registra la fecha de la decision (`decided_at`).
+1. Cada decisión se muestra en una tarjeta (DecisionCard).
+2. Seleccionar o escribir la respuesta según el tipo.
+3. Al guardar, se registra la fecha de la decisión (`decided_at`).
 4. Se muestra el progreso de decisiones respondidas.
 
-### 8.3 Constituir el Comite
+### 8.3 Constituir el Comité
 
-- Cuando las 8 decisiones estan respondidas, se puede marcar el comite como **"Constituido"**.
+- Cuando las 8 decisiones están respondidas, se puede marcar el comité como **"Constituido"**.
 - Esto es un requisito para avanzar de etapa.
 
 ---
 
-## 9. Reporte de Diagnostico
+## 9. Reporte de Diagnóstico
 
 **Ruta:** `/org/{orgId}/diagnostic`
 
-### 9.1 Generar Diagnostico
+### 9.1 Generar Diagnóstico
 
-1. El sistema ejecuta un **analisis cross-sesion** (todas las sesiones validadas).
-2. Se genera automaticamente:
-   - **Scores promedio** por dimension
+1. El sistema ejecuta un **análisis cross-sesión** (todas las sesiones validadas).
+2. Se genera automáticamente:
+   - **Scores promedio** por dimensión
    - **Brechas identificadas** entre dimensiones
    - **Evidencia** (citas directas de sesiones con speaker, rol y timestamp)
-   - **Quick wins sugeridos** (antes/despues, herramienta, esfuerzo, timeline)
-   - **Deep dives recomendados** (triggers por dimension)
+   - **Quick wins sugeridos** (antes/después, herramienta, esfuerzo, timeline)
+   - **Deep dives recomendados** (triggers por dimensión)
 
 ### 9.2 Navegar el Reporte
 
-1. **Scores por dimension**: paneles expandibles con summary, gaps y evidencia.
-2. **Quick wins**: lista de oportunidades rapidas con:
+1. **Scores por dimensión**: paneles expandibles con summary, gaps y evidencia.
+2. **Quick wins**: lista de oportunidades rápidas con:
    - Proceso actual vs proceso con IA
    - Herramienta sugerida
-   - Nivel de implementacion
+   - Nivel de implementación
    - Timeline estimado
 3. **Deep dives**: recomendaciones de sesiones adicionales si alguna dimension esta en rojo.
 
