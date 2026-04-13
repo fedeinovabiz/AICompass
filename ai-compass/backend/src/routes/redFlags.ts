@@ -71,7 +71,11 @@ router.get('/organization/:orgId', async (req, res, next) => {
       status: string;
       baseline: unknown;
       start_date: string | null;
-    }>('SELECT id, status, baseline, start_date FROM pilots WHERE organization_id = $1', [orgId]);
+      implementation_type: string | null;
+      cuj_id: string | null;
+      value_pnl: number | null;
+      value_effort: string | null;
+    }>('SELECT id, status, baseline, start_date, implementation_type, cuj_id, value_pnl, value_effort FROM pilots WHERE organization_id = $1', [orgId]);
 
     const pilotos = await Promise.all(
       pilotosRaw.map(async (p) => {
@@ -85,6 +89,10 @@ router.get('/organization/:orgId', async (req, res, next) => {
           baseline: baselineArr,
           startDate: p.start_date,
           metrics,
+          implementationType: p.implementation_type,
+          cujId: p.cuj_id,
+          valuePnl: p.value_pnl,
+          valueEffort: p.value_effort,
         };
       }),
     );

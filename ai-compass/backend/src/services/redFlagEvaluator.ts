@@ -22,6 +22,10 @@ export interface OrgState {
     baseline: unknown[];
     startDate: string | null;
     metrics: unknown[];
+    implementationType: string | null;
+    cujId: string | null;
+    valuePnl: number | null;
+    valueEffort: string | null;
   }>;
 }
 
@@ -131,6 +135,60 @@ function evaluarRF_SponsorAusente(state: OrgState): boolean {
   return sinSponsor.length > 2;
 }
 
+function evaluarRF12(state: OrgState): boolean {
+  // RF12: Cimientos rotos — score <=1 en datos/tecnología + piloto activo
+  const datosScore = state.maturityScores['datos'] ?? 0;
+  const techScore = state.maturityScores['tecnologia'] ?? 0;
+  const cimientosFragiles = datosScore <= 1 || techScore <= 1;
+  if (!cimientosFragiles) return false;
+  const pilotosActivos = state.pilots.filter(
+    (p) => p.status === 'active' || p.status === 'designing',
+  );
+  return pilotosActivos.length > 0;
+}
+
+function evaluarRF13(state: OrgState): boolean {
+  // RF13: Automatizando el pasado — piloto tipo "digitalization"
+  return state.pilots.some(
+    (p) =>
+      (p.status === 'designing' || p.status === 'active') &&
+      p.implementationType === 'digitalization',
+  );
+}
+
+function evaluarRF14(state: OrgState): boolean {
+  // RF14: Agent Sprawl — 3+ pilotos activos sin owner de gobernanza
+  const pilotosActivos = state.pilots.filter(
+    (p) => p.status === 'active' || p.status === 'designing',
+  );
+  if (pilotosActivos.length < 3) return false;
+  if (!state.committee) return true;
+  const tieneOwnerGobernanza = state.committee.members.some(
+    (m) => m.role === 'it-rep' || m.role === 'operational-leader',
+  );
+  return !tieneOwnerGobernanza;
+}
+
+function evaluarRF15(state: OrgState): boolean {
+  // RF15: Piloto sin CUJ vinculado
+  return state.pilots.some(
+    (p) =>
+      (p.status === 'active' || p.status === 'evaluating') &&
+      !p.cujId,
+  );
+}
+
+function evaluarRF16(state: OrgState): boolean {
+  // RF16: Bajo P&L para el esfuerzo
+  return state.pilots.some(
+    (p) =>
+      p.valuePnl !== null &&
+      p.valuePnl < 5000 &&
+      p.valueEffort !== null &&
+      ['M', 'L', 'XL'].includes(p.valueEffort),
+  );
+}
+
 // Mapa de evaluadores por ruleId (usando IDs del archivo de constantes)
 type Evaluador = (state: OrgState) => boolean;
 
@@ -146,6 +204,11 @@ const EVALUADORES: Record<string, Evaluador> = {
   RF09: evaluarRF10,       // Adopcion del piloto por debajo del 30%
   RF10: evaluarRF09,       // Piloto sin decision del comite al cumplir plazo
   RF11: evaluarRF_SponsorAusente, // Comite sin reuniones por mas de 30 dias
+  RF12: evaluarRF12,      // Cimientos rotos (deuda técnica + IA)
+  RF13: evaluarRF13,      // Automatizando el pasado
+  RF14: evaluarRF14,      // Agent Sprawl
+  RF15: evaluarRF15,      // Piloto sin CUJ
+  RF16: evaluarRF16,      // Bajo P&L para esfuerzo
 };
 
 export function evaluateRedFlags(orgState: OrgState): ActiveRedFlag[] {

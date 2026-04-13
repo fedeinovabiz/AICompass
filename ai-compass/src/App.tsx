@@ -21,6 +21,8 @@ import ScalingPlanDetailPage from './pages/ScalingPlanDetailPage';
 import TransformationDashboardPage from './pages/TransformationDashboardPage';
 import ProcessMapListPage from './pages/ProcessMapListPage';
 import ProcessMapDetailPage from './pages/ProcessMapDetailPage';
+import CujMapperPage from './pages/CujMapperPage';
+import ValueEngineeringPage from './pages/ValueEngineeringPage';
 import { useAuthStore } from './stores/authStore';
 
 export default function App() {
@@ -57,6 +59,11 @@ export default function App() {
           <Route path="/org/:orgId/processes/:processId" element={<ProcessMapDetailPage />} />
           {/* F-014c — Dashboard de Transformación */}
           <Route path="/org/:orgId/transformation" element={<TransformationDashboardPage />} />
+          {/* CUJ Mapper */}
+          <Route path="/org/:orgId/cujs/new" element={<CujMapperPage />} />
+          <Route path="/org/:orgId/cujs/:cujId" element={<CujMapperPage />} />
+          {/* Value Engineering */}
+          <Route path="/org/:orgId/value-engineering" element={<ValueEngineeringPage />} />
           {/* F-012 — Report Builder */}
           <Route path="/org/:orgId/reports" element={<ReportBuilderPage />} />
         </Route>

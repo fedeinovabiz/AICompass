@@ -292,6 +292,15 @@ export interface Pilot {
   committeeDecision?: string;
   committeeDecisionDate?: string;
   quickWinIds: string[];
+  // Value Engineering
+  implementationType: ImplementationType;
+  cujId: string | null;
+  valuePnl: number | null;
+  valuePnlType: ValuePnlType | null;
+  valueEffort: ValueEffort | null;
+  valueRisk: ValueRisk | null;
+  valueTimeToValue: ValueTimeToValue | null;
+  valueScore: number | null;
   createdAt: string;
 }
 
@@ -505,4 +514,50 @@ export interface FailurePattern {
   description: string;
   source: string;
   prevention: string;
+}
+
+// ══════════════════════════════════════════════
+// VALUE ENGINEERING
+// ══════════════════════════════════════════════
+
+export type ImplementationType = 'digitalization' | 'redesign';
+export type ValueEffort = 'S' | 'M' | 'L' | 'XL';
+export type ValueRisk = 'low' | 'medium' | 'high';
+export type ValueTimeToValue = 'under_4w' | '4_to_12w' | 'over_12w';
+export type ValuePnlType = 'savings' | 'revenue';
+
+export interface ValueAssessment {
+  valuePnl: number | null;
+  valuePnlType: ValuePnlType | null;
+  valueEffort: ValueEffort | null;
+  valueRisk: ValueRisk | null;
+  valueTimeToValue: ValueTimeToValue | null;
+  valueScore: number | null;
+}
+
+// ══════════════════════════════════════════════
+// CUJ (Critical User Journeys)
+// ══════════════════════════════════════════════
+
+export interface CujStep {
+  id: string;
+  cujId: string;
+  stepOrder: number;
+  description: string;
+  actor: string;
+  currentTool: string;
+  estimatedTimeMinutes: number;
+  painPoint: string;
+  agentCandidate: boolean;
+}
+
+export interface Cuj {
+  id: string;
+  engagementId: string;
+  name: string;
+  actor: string;
+  objective: string;
+  steps: CujStep[];
+  createdAt: string;
+  updatedAt: string;
 }

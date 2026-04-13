@@ -5,6 +5,28 @@ import { query, getOne, getMany } from '../db';
 const router = Router();
 router.use(authMiddleware);
 
+function calcValueScore(
+  pnl: number | null | undefined,
+  effort: string | null | undefined,
+  risk: string | null | undefined,
+  ttv: string | null | undefined,
+): number | null {
+  if (pnl == null || !effort || !risk || !ttv) return null;
+
+  const PNL_CAP = 500000;
+  const pnlNorm = Math.min(pnl / PNL_CAP, 1) * 100;
+
+  const effortMap: Record<string, number> = { XL: 25, L: 50, M: 75, S: 100 };
+  const riskMap: Record<string, number> = { high: 33, medium: 66, low: 100 };
+  const ttvMap: Record<string, number> = { over_12w: 33, '4_to_12w': 66, under_4w: 100 };
+
+  const effortInv = effortMap[effort] ?? 50;
+  const riskInv = riskMap[risk] ?? 50;
+  const ttvInv = ttvMap[ttv] ?? 50;
+
+  return Math.round(pnlNorm * 0.40 + effortInv * 0.25 + riskInv * 0.20 + ttvInv * 0.15);
+}
+
 // GET /organization/:orgId — Lista pilotos de una organización
 router.get('/organization/:orgId', async (req, res, next) => {
   try {
@@ -41,17 +63,27 @@ router.get('/:id', async (req, res, next) => {
 // POST / — Crear piloto
 router.post('/', async (req, res, next) => {
   try {
-    const { organizationId, name, description, targetProcess, startDate, endDate } = req.body;
+    const {
+      organizationId, name, description, targetProcess, startDate, endDate,
+      implementationType, cujId, valuePnl, valuePnlType, valueEffort, valueRisk, valueTimeToValue,
+    } = req.body;
     if (!organizationId || !name) {
       res.status(400).json({ message: 'Los campos organizationId y name son requeridos', code: 'VALIDATION_ERROR' });
       return;
     }
 
+    const valueScore = calcValueScore(valuePnl, valueEffort, valueRisk, valueTimeToValue);
+
     const result = await query(
-      `INSERT INTO pilots (organization_id, name, description, target_process, start_date, end_date, status)
-       VALUES ($1, $2, $3, $4, $5, $6, 'planning')
+      `INSERT INTO pilots (organization_id, name, description, target_process, start_date, end_date, status,
+        implementation_type, cuj_id, value_pnl, value_pnl_type, value_effort, value_risk, value_time_to_value, value_score)
+       VALUES ($1, $2, $3, $4, $5, $6, 'planning', $7, $8, $9, $10, $11, $12, $13, $14)
        RETURNING *`,
-      [organizationId, name, description ?? null, targetProcess ?? null, startDate ?? null, endDate ?? null],
+      [
+        organizationId, name, description ?? null, targetProcess ?? null, startDate ?? null, endDate ?? null,
+        implementationType ?? 'redesign', cujId ?? null, valuePnl ?? null, valuePnlType ?? null,
+        valueEffort ?? null, valueRisk ?? null, valueTimeToValue ?? null, valueScore,
+      ],
     );
 
     res.status(201).json(result.rows[0]);
@@ -64,15 +96,9 @@ router.post('/', async (req, res, next) => {
 router.put('/:id', async (req, res, next) => {
   try {
     const {
-      name,
-      description,
-      status,
-      workflowDesign,
-      championAssignments,
-      roleImpacts,
-      targetProcess,
-      startDate,
-      endDate,
+      name, description, status, workflowDesign, championAssignments, roleImpacts,
+      targetProcess, startDate, endDate,
+      implementationType, cujId, valuePnl, valuePnlType, valueEffort, valueRisk, valueTimeToValue,
     } = req.body;
 
     const existing = await getOne('SELECT id FROM pilots WHERE id = $1', [req.params.id]);
@@ -80,6 +106,8 @@ router.put('/:id', async (req, res, next) => {
       res.status(404).json({ message: 'Piloto no encontrado', code: 'NOT_FOUND' });
       return;
     }
+
+    const valueScore = calcValueScore(valuePnl, valueEffort, valueRisk, valueTimeToValue);
 
     const result = await query(
       `UPDATE pilots SET
@@ -92,20 +120,30 @@ router.put('/:id', async (req, res, next) => {
          target_process = COALESCE($7, target_process),
          start_date = COALESCE($8, start_date),
          end_date = COALESCE($9, end_date),
+         implementation_type = COALESCE($10, implementation_type),
+         cuj_id = $11,
+         value_pnl = $12,
+         value_pnl_type = $13,
+         value_effort = $14,
+         value_risk = $15,
+         value_time_to_value = $16,
+         value_score = COALESCE($17, value_score),
          updated_at = NOW()
-       WHERE id = $10
+       WHERE id = $18
        RETURNING *`,
       [
-        name ?? null,
-        description ?? null,
-        status ?? null,
+        name ?? null, description ?? null, status ?? null,
         workflowDesign ? JSON.stringify(workflowDesign) : null,
         championAssignments ? JSON.stringify(championAssignments) : null,
         roleImpacts ? JSON.stringify(roleImpacts) : null,
-        targetProcess ?? null,
-        startDate ?? null,
-        endDate ?? null,
-        req.params.id,
+        targetProcess ?? null, startDate ?? null, endDate ?? null,
+        implementationType ?? null, cujId !== undefined ? cujId : null,
+        valuePnl !== undefined ? valuePnl : null,
+        valuePnlType !== undefined ? valuePnlType : null,
+        valueEffort !== undefined ? valueEffort : null,
+        valueRisk !== undefined ? valueRisk : null,
+        valueTimeToValue !== undefined ? valueTimeToValue : null,
+        valueScore, req.params.id,
       ],
     );
 

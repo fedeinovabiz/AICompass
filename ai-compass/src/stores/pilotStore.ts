@@ -14,6 +14,13 @@ interface CreatePilotData {
   teamSize: number;
   championName: string;
   championEmail: string;
+  implementationType?: 'digitalization' | 'redesign';
+  cujId?: string;
+  valuePnl?: number;
+  valuePnlType?: 'savings' | 'revenue';
+  valueEffort?: 'S' | 'M' | 'L' | 'XL';
+  valueRisk?: 'low' | 'medium' | 'high';
+  valueTimeToValue?: 'under_4w' | '4_to_12w' | 'over_12w';
 }
 
 interface UpdatePilotData {
@@ -27,6 +34,13 @@ interface UpdatePilotData {
   workflowDesign?: Pilot['workflowDesign'];
   champions?: Pilot['champions'];
   roleImpacts?: Pilot['roleImpacts'];
+  implementationType?: 'digitalization' | 'redesign';
+  cujId?: string | null;
+  valuePnl?: number | null;
+  valuePnlType?: 'savings' | 'revenue' | null;
+  valueEffort?: 'S' | 'M' | 'L' | 'XL' | null;
+  valueRisk?: 'low' | 'medium' | 'high' | null;
+  valueTimeToValue?: 'under_4w' | '4_to_12w' | 'over_12w' | null;
 }
 
 interface PilotState {
