@@ -75,7 +75,8 @@ router.get('/organization/:orgId', async (req, res, next) => {
       cuj_id: string | null;
       value_pnl: number | null;
       value_effort: string | null;
-    }>('SELECT id, status, baseline, start_date, implementation_type, cuj_id, value_pnl, value_effort FROM pilots WHERE organization_id = $1', [orgId]);
+      department_area_id: string | null;
+    }>('SELECT id, status, baseline, start_date, implementation_type, cuj_id, value_pnl, value_effort, department_area_id FROM pilots WHERE organization_id = $1', [orgId]);
 
     const pilotos = await Promise.all(
       pilotosRaw.map(async (p) => {
@@ -93,9 +94,20 @@ router.get('/organization/:orgId', async (req, res, next) => {
           cujId: p.cuj_id,
           valuePnl: p.value_pnl,
           valueEffort: p.value_effort,
+          departmentAreaId: p.department_area_id ?? null,
         };
       }),
     );
+
+    // Cargar áreas departamentales
+    const areasRaw = await getMany<{ id: string; assessment_status: string }>(
+      'SELECT id, assessment_status FROM department_areas WHERE organization_id = $1',
+      [orgId],
+    );
+    const departmentAreas = areasRaw.map(a => ({
+      id: a.id,
+      assessmentStatus: a.assessment_status,
+    }));
 
     // Construir estado de la organización
     const orgState: OrgState = {
@@ -104,6 +116,7 @@ router.get('/organization/:orgId', async (req, res, next) => {
       sessions: sesionesConParticipantes,
       committee: committeeData,
       pilots: pilotos,
+      departmentAreas,
     };
 
     // Evaluar red flags

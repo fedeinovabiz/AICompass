@@ -26,6 +26,11 @@ export interface OrgState {
     cujId: string | null;
     valuePnl: number | null;
     valueEffort: string | null;
+    departmentAreaId: string | null;
+  }>;
+  departmentAreas: Array<{
+    id: string;
+    assessmentStatus: string;
   }>;
 }
 
@@ -189,6 +194,29 @@ function evaluarRF16(state: OrgState): boolean {
   );
 }
 
+function evaluarRF17(state: OrgState): boolean {
+  // RF17: 2+ pilotos activos en un área con assessment heredado
+  const pilotosActivos = state.pilots.filter(
+    (p) => ['active', 'evaluating'].includes(p.status) && p.departmentAreaId,
+  );
+
+  const porArea = new Map<string, number>();
+  for (const p of pilotosActivos) {
+    const areaId = p.departmentAreaId!;
+    porArea.set(areaId, (porArea.get(areaId) ?? 0) + 1);
+  }
+
+  for (const [areaId, count] of porArea) {
+    if (count < 2) continue;
+    const area = state.departmentAreas.find((a) => a.id === areaId);
+    if (area && area.assessmentStatus === 'inherited') {
+      return true;
+    }
+  }
+
+  return false;
+}
+
 // Mapa de evaluadores por ruleId (usando IDs del archivo de constantes)
 type Evaluador = (state: OrgState) => boolean;
 
@@ -209,6 +237,7 @@ const EVALUADORES: Record<string, Evaluador> = {
   RF14: evaluarRF14,      // Agent Sprawl
   RF15: evaluarRF15,      // Piloto sin CUJ
   RF16: evaluarRF16,      // Bajo P&L para esfuerzo
+  RF17: evaluarRF17,      // Área con múltiples pilotos sin diagnóstico propio
 };
 
 export function evaluateRedFlags(orgState: OrgState): ActiveRedFlag[] {

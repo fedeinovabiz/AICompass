@@ -6,7 +6,8 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useOrganizationStore } from '@/stores/organizationStore';
 import { useAuthStore } from '@/stores/authStore';
-import type { Organization } from '@/types';
+import AiOperatingLevelBadge from '@/components/AiOperatingLevelBadge';
+import type { Organization, AiOperatingLevel } from '@/types';
 
 const STAGE_LABELS: Record<number, string> = {
   1: 'Etapa 1',
@@ -47,7 +48,7 @@ function OrgCard({ org, onClick }: { org: Organization; onClick: () => void }) {
     >
       <h3 className="text-white font-semibold text-base mb-1 truncate">{org.name}</h3>
       <p className="text-slate-400 text-sm mb-3 truncate">{org.industry}</p>
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between mb-2">
         <span className="inline-block px-2 py-0.5 bg-blue-900 text-blue-300 text-xs rounded-full font-medium">
           {STAGE_LABELS[org.currentStage] ?? `Etapa ${org.currentStage}`}
         </span>
@@ -55,6 +56,9 @@ function OrgCard({ org, onClick }: { org: Organization; onClick: () => void }) {
           Score: <span className="text-white font-medium">{averageScore(org.maturityScores)}</span>
         </span>
       </div>
+      {org.aiOperatingLevel && (
+        <AiOperatingLevelBadge level={org.aiOperatingLevel as AiOperatingLevel} />
+      )}
     </button>
   );
 }

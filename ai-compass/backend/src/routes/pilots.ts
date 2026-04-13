@@ -66,6 +66,7 @@ router.post('/', async (req, res, next) => {
     const {
       organizationId, name, description, targetProcess, startDate, endDate,
       implementationType, cujId, valuePnl, valuePnlType, valueEffort, valueRisk, valueTimeToValue,
+      departmentAreaId,
     } = req.body;
     if (!organizationId || !name) {
       res.status(400).json({ message: 'Los campos organizationId y name (title) son requeridos', code: 'VALIDATION_ERROR' });
@@ -76,13 +77,15 @@ router.post('/', async (req, res, next) => {
 
     const result = await query(
       `INSERT INTO pilots (organization_id, title, process_description, target_process, start_date, end_date, status,
-        implementation_type, cuj_id, value_pnl, value_pnl_type, value_effort, value_risk, value_time_to_value, value_score)
-       VALUES ($1, $2, $3, $4, $5, $6, 'planning', $7, $8, $9, $10, $11, $12, $13, $14)
+        implementation_type, cuj_id, value_pnl, value_pnl_type, value_effort, value_risk, value_time_to_value, value_score,
+        department_area_id)
+       VALUES ($1, $2, $3, $4, $5, $6, 'planning', $7, $8, $9, $10, $11, $12, $13, $14, $15)
        RETURNING *`,
       [
         organizationId, name, description ?? null, targetProcess ?? null, startDate ?? null, endDate ?? null,
         implementationType ?? 'redesign', cujId ?? null, valuePnl ?? null, valuePnlType ?? null,
         valueEffort ?? null, valueRisk ?? null, valueTimeToValue ?? null, valueScore,
+        departmentAreaId ?? null,
       ],
     );
 
@@ -99,6 +102,7 @@ router.put('/:id', async (req, res, next) => {
       title, status, workflowDesign, championAssignments, roleImpacts,
       startDate,
       implementationType, cujId, valuePnl, valuePnlType, valueEffort, valueRisk, valueTimeToValue,
+      departmentAreaId,
     } = req.body;
 
     const existing = await getOne('SELECT id FROM pilots WHERE id = $1', [req.params.id]);
@@ -125,8 +129,9 @@ router.put('/:id', async (req, res, next) => {
          value_risk = $12,
          value_time_to_value = $13,
          value_score = COALESCE($14, value_score),
+         department_area_id = COALESCE($15, department_area_id),
          updated_at = NOW()
-       WHERE id = $15
+       WHERE id = $16
        RETURNING *`,
       [
         title ?? null, status ?? null,
@@ -140,7 +145,7 @@ router.put('/:id', async (req, res, next) => {
         valueEffort !== undefined ? valueEffort : null,
         valueRisk !== undefined ? valueRisk : null,
         valueTimeToValue !== undefined ? valueTimeToValue : null,
-        valueScore, req.params.id,
+        valueScore, departmentAreaId ?? null, req.params.id,
       ],
     );
 

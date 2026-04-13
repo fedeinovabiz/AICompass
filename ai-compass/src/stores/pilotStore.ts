@@ -21,6 +21,7 @@ interface CreatePilotData {
   valueEffort?: 'S' | 'M' | 'L' | 'XL';
   valueRisk?: 'low' | 'medium' | 'high';
   valueTimeToValue?: 'under_4w' | '4_to_12w' | 'over_12w';
+  departmentAreaId?: string;
 }
 
 interface UpdatePilotData {
@@ -41,6 +42,7 @@ interface UpdatePilotData {
   valueEffort?: 'S' | 'M' | 'L' | 'XL' | null;
   valueRisk?: 'low' | 'medium' | 'high' | null;
   valueTimeToValue?: 'under_4w' | '4_to_12w' | 'over_12w' | null;
+  departmentAreaId?: string | null;
 }
 
 interface PilotState {

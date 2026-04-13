@@ -23,6 +23,9 @@ import ProcessMapListPage from './pages/ProcessMapListPage';
 import ProcessMapDetailPage from './pages/ProcessMapDetailPage';
 import CujMapperPage from './pages/CujMapperPage';
 import ValueEngineeringPage from './pages/ValueEngineeringPage';
+import AreaListPage from './pages/AreaListPage';
+import AreaDetailPage from './pages/AreaDetailPage';
+import AreaMiniAssessmentPage from './pages/AreaMiniAssessmentPage';
 import { useAuthStore } from './stores/authStore';
 
 export default function App() {
@@ -64,6 +67,10 @@ export default function App() {
           <Route path="/org/:orgId/cujs/:cujId" element={<CujMapperPage />} />
           {/* Value Engineering */}
           <Route path="/org/:orgId/value-engineering" element={<ValueEngineeringPage />} />
+          {/* Áreas departamentales */}
+          <Route path="/org/:orgId/areas" element={<AreaListPage />} />
+          <Route path="/org/:orgId/areas/:areaId" element={<AreaDetailPage />} />
+          <Route path="/org/:orgId/areas/:areaId/mini-assessment" element={<AreaMiniAssessmentPage />} />
           {/* F-012 — Report Builder */}
           <Route path="/org/:orgId/reports" element={<ReportBuilderPage />} />
         </Route>

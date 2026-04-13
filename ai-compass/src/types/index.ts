@@ -63,6 +63,23 @@ export type ValueChainSegment =
 
 export type ImplementationLevel = 'prompting' | 'no-code' | 'custom';
 
+export type AreaAssessmentStatus = 'inherited' | 'mini-assessed' | 'full-assessed';
+
+export type AiOperatingLevel = 1 | 2 | 3 | 4;
+
+export type StandardArea =
+  | 'finanzas'
+  | 'marketing'
+  | 'ventas'
+  | 'operaciones'
+  | 'rrhh'
+  | 'legal'
+  | 'it'
+  | 'producto'
+  | 'atencion-al-cliente'
+  | 'logistica'
+  | 'custom';
+
 export type DeliverableType =
   | 'findings-map'
   | 'committee-proposal'
@@ -103,6 +120,7 @@ export interface Organization {
   contactEmail: string;
   currentStage: Stage;
   maturityScores: Record<DimensionKey, number | null>;
+  aiOperatingLevel: AiOperatingLevel | null;
   stageHistory: StageTransition[];
   stageCriteria: Record<string, boolean>;
   createdAt: string;
@@ -273,6 +291,7 @@ export interface PilotMetricEntry {
 export interface Pilot {
   id: string;
   organizationId: string;
+  departmentAreaId: string | null;
   title: string;
   processDescription: string;
   processBefore: string;
@@ -376,6 +395,7 @@ export interface QuickWinSuggestion {
   valueChainSegment: ValueChainSegment;
   implementationLevel: ImplementationLevel;
   diminishingReturns: string;
+  suggestedArea?: string;
 }
 
 export interface CrossSessionAnalysis {
@@ -560,4 +580,30 @@ export interface Cuj {
   steps: CujStep[];
   createdAt: string;
   updatedAt: string;
+}
+
+// ══════════════════════════════════════════════
+// ÁREAS DEPARTAMENTALES
+// ══════════════════════════════════════════════
+
+export interface DepartmentArea {
+  id: string;
+  organizationId: string;
+  standardArea: StandardArea;
+  customName?: string;
+  displayName: string;
+  maturityScores: Record<DimensionKey, number | null>;
+  assessmentStatus: AreaAssessmentStatus;
+  aiOperatingLevel: AiOperatingLevel | null;
+  assessedAt?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface MiniAssessmentAnswer {
+  dimension: DimensionKey;
+  questionIndex: number;
+  questionText: string;
+  answer: string;
+  suggestedLevel: MaturityLevel;
 }

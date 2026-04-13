@@ -177,6 +177,16 @@ export const RED_FLAG_RULES: RedFlagRule[] = [
     recommendation: 'Reevaluar la prioridad de este piloto frente a otros con mejor relación impacto/esfuerzo. Usar la Matriz de Value Engineering para comparar.',
     canOverride: true,
   },
+  {
+    id: 'RF17',
+    severity: 'warning',
+    title: 'Área con múltiples pilotos sin diagnóstico propio',
+    description: 'Hay 2+ pilotos activos en un área cuya madurez se basa en scores heredados del baseline organizacional, no en un diagnóstico propio.',
+    stage: 3,
+    condition: '2+ pilotos activos/evaluating en un área con assessmentStatus = inherited.',
+    recommendation: 'Realizar mini-assessment del área para validar que los scores organizacionales aplican. Un área puede estar significativamente por encima o por debajo del promedio.',
+    canOverride: true,
+  },
 ];
 
 export function getRedFlagsByStage(stage: Stage): RedFlagRule[] {

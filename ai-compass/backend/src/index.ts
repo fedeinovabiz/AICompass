@@ -19,6 +19,7 @@ import processRoutes from './routes/processes';
 import scalingRoutes from './routes/scaling';
 import cujRoutes from './routes/cujs';
 import valueEngineeringRoutes from './routes/valueEngineering';
+import areaRoutes from './routes/areas';
 
 const app = express();
 
@@ -46,6 +47,7 @@ app.use('/api/processes', processRoutes);
 app.use('/api/scaling', scalingRoutes);
 app.use('/api/cujs', cujRoutes);
 app.use('/api/value-engineering', valueEngineeringRoutes);
+app.use('/api/areas', areaRoutes);
 
 app.use(errorHandler);
 
