@@ -80,7 +80,7 @@ router.get('/organization/:orgId', async (req, res, next) => {
     const pilotos = await Promise.all(
       pilotosRaw.map(async (p) => {
         const metrics = await getMany<unknown>(
-          'SELECT adoption_metrics FROM pilot_metrics WHERE pilot_id = $1 ORDER BY recorded_at DESC',
+          'SELECT adoption_metrics FROM pilot_metrics WHERE pilot_id = $1 ORDER BY created_at DESC',
           [p.id],
         );
         const baselineArr = Array.isArray(p.baseline) ? p.baseline : (p.baseline ? [p.baseline] : []);

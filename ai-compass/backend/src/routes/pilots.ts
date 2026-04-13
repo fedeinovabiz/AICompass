@@ -68,14 +68,14 @@ router.post('/', async (req, res, next) => {
       implementationType, cujId, valuePnl, valuePnlType, valueEffort, valueRisk, valueTimeToValue,
     } = req.body;
     if (!organizationId || !name) {
-      res.status(400).json({ message: 'Los campos organizationId y name son requeridos', code: 'VALIDATION_ERROR' });
+      res.status(400).json({ message: 'Los campos organizationId y name (title) son requeridos', code: 'VALIDATION_ERROR' });
       return;
     }
 
     const valueScore = calcValueScore(valuePnl, valueEffort, valueRisk, valueTimeToValue);
 
     const result = await query(
-      `INSERT INTO pilots (organization_id, name, description, target_process, start_date, end_date, status,
+      `INSERT INTO pilots (organization_id, title, process_description, target_process, start_date, end_date, status,
         implementation_type, cuj_id, value_pnl, value_pnl_type, value_effort, value_risk, value_time_to_value, value_score)
        VALUES ($1, $2, $3, $4, $5, $6, 'planning', $7, $8, $9, $10, $11, $12, $13, $14)
        RETURNING *`,
@@ -96,8 +96,8 @@ router.post('/', async (req, res, next) => {
 router.put('/:id', async (req, res, next) => {
   try {
     const {
-      name, description, status, workflowDesign, championAssignments, roleImpacts,
-      targetProcess, startDate, endDate,
+      title, status, workflowDesign, championAssignments, roleImpacts,
+      startDate,
       implementationType, cujId, valuePnl, valuePnlType, valueEffort, valueRisk, valueTimeToValue,
     } = req.body;
 
@@ -111,32 +111,29 @@ router.put('/:id', async (req, res, next) => {
 
     const result = await query(
       `UPDATE pilots SET
-         name = COALESCE($1, name),
-         description = COALESCE($2, description),
-         status = COALESCE($3, status),
-         workflow_design = COALESCE($4, workflow_design),
-         champion_assignments = COALESCE($5, champion_assignments),
-         role_impacts = COALESCE($6, role_impacts),
-         target_process = COALESCE($7, target_process),
-         start_date = COALESCE($8, start_date),
-         end_date = COALESCE($9, end_date),
-         implementation_type = COALESCE($10, implementation_type),
-         cuj_id = $11,
-         value_pnl = $12,
-         value_pnl_type = $13,
-         value_effort = $14,
-         value_risk = $15,
-         value_time_to_value = $16,
-         value_score = COALESCE($17, value_score),
+         title = COALESCE($1, title),
+         status = COALESCE($2, status),
+         workflow_design = COALESCE($3, workflow_design),
+         champion_assignments = COALESCE($4, champion_assignments),
+         role_impacts = COALESCE($5, role_impacts),
+         start_date = COALESCE($6, start_date),
+         implementation_type = COALESCE($7, implementation_type),
+         cuj_id = $8,
+         value_pnl = $9,
+         value_pnl_type = $10,
+         value_effort = $11,
+         value_risk = $12,
+         value_time_to_value = $13,
+         value_score = COALESCE($14, value_score),
          updated_at = NOW()
-       WHERE id = $18
+       WHERE id = $15
        RETURNING *`,
       [
-        name ?? null, description ?? null, status ?? null,
+        title ?? null, status ?? null,
         workflowDesign ? JSON.stringify(workflowDesign) : null,
         championAssignments ? JSON.stringify(championAssignments) : null,
         roleImpacts ? JSON.stringify(roleImpacts) : null,
-        targetProcess ?? null, startDate ?? null, endDate ?? null,
+        startDate ?? null,
         implementationType ?? null, cujId !== undefined ? cujId : null,
         valuePnl !== undefined ? valuePnl : null,
         valuePnlType !== undefined ? valuePnlType : null,

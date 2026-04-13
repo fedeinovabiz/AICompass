@@ -41,7 +41,7 @@ router.get('/organization/:orgId', async (req, res, next) => {
 
     const conScore = pilots.filter((p) => p.value_score !== null);
     const sinScore = pilots.filter((p) => p.value_score === null);
-    const totalPnl = conScore.reduce((sum, p) => sum + (p.value_pnl ?? 0), 0);
+    const totalPnl = conScore.reduce((sum, p) => sum + Number(p.value_pnl ?? 0), 0);
 
     res.json({
       pilots,
