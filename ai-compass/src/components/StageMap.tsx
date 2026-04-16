@@ -12,7 +12,7 @@ interface StageMapProps {
 
 export default function StageMap({ currentStage, onStageClick }: StageMapProps) {
   return (
-    <div className="flex items-center gap-0 overflow-x-auto pb-2">
+    <div className="flex items-center gap-0 overflow-x-auto pt-3 pb-2">
       {STAGES.map((stageDef, idx) => {
         const isCurrent = stageDef.stage === currentStage;
         const isPast = stageDef.stage < currentStage;

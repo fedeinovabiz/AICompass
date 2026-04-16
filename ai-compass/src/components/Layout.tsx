@@ -2,7 +2,7 @@
 // LAYOUT — Shell principal con sidebar y header
 // ══════════════════════════════════════════════
 
-import { NavLink, Outlet, useParams } from 'react-router-dom';
+import { NavLink, Outlet, useParams, Link } from 'react-router-dom';
 import { useAuthStore } from '@/stores/authStore';
 import RedFlagBanner from './RedFlagBanner';
 
@@ -34,7 +34,7 @@ export default function Layout() {
       {/* Sidebar */}
       <aside className="w-64 bg-slate-800 flex flex-col shrink-0">
         <div className="h-16 flex items-center px-6 border-b border-slate-700">
-          <h1 className="text-white font-bold text-lg tracking-tight">AI Compass</h1>
+          <Link to="/dashboard" className="text-white font-bold text-lg tracking-tight hover:text-blue-400 transition-colors">AI Compass</Link>
         </div>
 
         <nav className="flex-1 p-4 space-y-1">
