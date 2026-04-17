@@ -139,7 +139,7 @@ function ChampionCard({
 }
 
 export default function ChampionsSection({ champions, teamSize, onSave, isSaving }: Props) {
-  const [items, setItems] = useState<ChampionAssignment[]>(champions);
+  const [items, setItems] = useState<ChampionAssignment[]>(champions ?? []);
 
   const idealChampions = Math.ceil(teamSize / IDEAL_RATIO);
   const ratio = items.length > 0 ? Math.round(teamSize / items.length) : teamSize;

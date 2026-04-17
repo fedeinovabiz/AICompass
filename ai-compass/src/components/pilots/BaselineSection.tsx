@@ -15,7 +15,7 @@ interface Props {
 const EMPTY_METRIC: PilotMetric = { name: '', unit: '', baselineValue: 0 };
 
 export default function BaselineSection({ baseline, pilotStatus, onSave, isSaving }: Props) {
-  const [metrics, setMetrics] = useState<PilotMetric[]>(baseline);
+  const [metrics, setMetrics] = useState<PilotMetric[]>(baseline ?? []);
 
   const showRedFlag = pilotStatus === 'active' && metrics.length === 0;
 

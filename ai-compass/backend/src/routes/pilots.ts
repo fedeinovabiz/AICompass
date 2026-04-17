@@ -50,7 +50,7 @@ router.get('/:id', async (req, res, next) => {
     }
 
     const metrics = await getMany(
-      'SELECT * FROM pilot_metrics WHERE pilot_id = $1 ORDER BY recorded_at DESC',
+      'SELECT * FROM pilot_metrics WHERE pilot_id = $1 ORDER BY created_at DESC',
       [req.params.id],
     );
 
@@ -230,12 +230,11 @@ router.put('/:id/decision', async (req, res, next) => {
     const result = await query(
       `UPDATE pilots SET
          committee_decision = $1,
-         decision_date = COALESCE($2, decision_date),
-         decision_notes = COALESCE($3, decision_notes),
+         committee_decision_date = COALESCE($2, committee_decision_date),
          updated_at = NOW()
-       WHERE id = $4
+       WHERE id = $3
        RETURNING *`,
-      [committeeDecision, decisionDate ?? null, decisionNotes ?? null, req.params.id],
+      [committeeDecision, decisionDate ?? null, req.params.id],
     );
 
     res.json(result.rows[0]);

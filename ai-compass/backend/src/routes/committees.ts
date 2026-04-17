@@ -188,7 +188,7 @@ router.post('/:id/meetings', async (req, res, next) => {
     }
 
     const result = await query(
-      `INSERT INTO committee_meetings (committee_id, meeting_date, notes, attendees)
+      `INSERT INTO committee_meetings (committee_id, date, notes, attendees)
        VALUES ($1, $2, $3, $4)
        RETURNING *`,
       [req.params.id, meetingDate, notes ?? null, attendees ? JSON.stringify(attendees) : null],

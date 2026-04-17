@@ -21,7 +21,7 @@ const EMPTY_IMPACT: RoleImpact = {
 const HIGH_IMPACT_THRESHOLD = 30;
 
 export default function RoleImpactSection({ roleImpacts, onSave, isSaving }: Props) {
-  const [impacts, setImpacts] = useState<RoleImpact[]>(roleImpacts);
+  const [impacts, setImpacts] = useState<RoleImpact[]>(roleImpacts ?? []);
 
   const alertRoles = impacts.filter(
     (r) => r.timeFreedPercent > HIGH_IMPACT_THRESHOLD && !r.proposedIncentive.trim(),

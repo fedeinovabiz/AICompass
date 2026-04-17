@@ -539,7 +539,7 @@ function ToolCatalogSection({
                     </td>
                     <td className="py-3 pr-4 text-slate-300">{tool.licenses}</td>
                     <td className="py-3 pr-4 text-slate-300">
-                      ${tool.monthlyCost.toFixed(2)}
+                      ${Number(tool.monthlyCost).toFixed(2)}
                     </td>
                     <td className="py-3 pr-4 text-slate-300 max-w-xs">
                       {tool.teamsUsing.length > 0

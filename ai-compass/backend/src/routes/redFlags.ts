@@ -122,6 +122,15 @@ router.get('/organization/:orgId', async (req, res, next) => {
     // Evaluar red flags
     const redFlagsActivos = evaluateRedFlags(orgState);
 
+    // Cargar red flags resueltos/overridden de la DB para excluirlos
+    const resueltos = await getMany<{ rule_id: string }>(
+      'SELECT rule_id FROM red_flags WHERE organization_id = $1 AND resolved_at IS NOT NULL',
+      [orgId],
+    ).catch(() => [] as { rule_id: string }[]);
+
+    const resueltosSet = new Set(resueltos.map(r => r.rule_id));
+    const redFlagsFiltrados = redFlagsActivos.filter(f => !resueltosSet.has(f.ruleId));
+
     // Persistir red flags detectados (upsert por ruleId + orgId)
     for (const flag of redFlagsActivos) {
       await query(
@@ -140,7 +149,7 @@ router.get('/organization/:orgId', async (req, res, next) => {
       });
     }
 
-    res.json(redFlagsActivos);
+    res.json(redFlagsFiltrados);
   } catch (err) {
     next(err);
   }
