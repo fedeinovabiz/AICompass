@@ -175,6 +175,7 @@ router.post('/:id/convert-to-pilot', roleGuard('facilitator', 'admin'), async (r
       id: string;
       organization_id: string;
       name: string;
+      description: string | null;
       current_steps: unknown[];
       redesigned_steps: unknown[];
       status: string;
@@ -187,13 +188,15 @@ router.post('/:id/convert-to-pilot', roleGuard('facilitator', 'admin'), async (r
 
     const processBefore = JSON.stringify(processMap.current_steps);
     const processAfter = JSON.stringify(processMap.redesigned_steps);
+    const processDescription = processMap.description ?? processMap.name;
 
     const pilotResult = await query(
       `INSERT INTO pilots
-         (organization_id, title, process_before, process_after, status, tool, team_size, champion_name, champion_email)
-       VALUES ($1, $2, $3, $4, 'designing', '', 0, '', '')
+         (organization_id, title, process_description, process_before, process_after,
+          status, tool, team_size, champion_name, champion_email)
+       VALUES ($1, $2, $3, $4, $5, 'designing', '', 0, '', '')
        RETURNING *`,
-      [processMap.organization_id, processMap.name, processBefore, processAfter],
+      [processMap.organization_id, processMap.name, processDescription, processBefore, processAfter],
     );
 
     await query(

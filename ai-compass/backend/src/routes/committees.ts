@@ -50,19 +50,13 @@ router.post('/', roleGuard('facilitator', 'admin'), async (req, res, next) => {
 
     const committee = result.rows[0];
 
-    // Insertar las 8 decisiones fundacionales
+    // Insertar las 8 decisiones fundacionales (template: number, title, description)
+    // placeholder y options viven en el frontend; el schema solo persiste la respuesta del comité.
     for (const decision of FOUNDATIONAL_DECISIONS) {
       await query(
-        `INSERT INTO committee_decisions (committee_id, decision_number, title, description, placeholder, options)
-         VALUES ($1, $2, $3, $4, $5, $6)`,
-        [
-          committee.id,
-          decision.number,
-          decision.title,
-          decision.description,
-          decision.placeholder,
-          decision.options ? JSON.stringify(decision.options) : null,
-        ],
+        `INSERT INTO foundational_decisions (committee_id, number, title, description)
+         VALUES ($1, $2, $3, $4)`,
+        [committee.id, decision.number, decision.title, decision.description],
       );
     }
 
@@ -76,8 +70,11 @@ router.post('/', roleGuard('facilitator', 'admin'), async (req, res, next) => {
 router.post('/:id/members', roleGuard('facilitator', 'admin'), async (req, res, next) => {
   try {
     const { name, role, email, area } = req.body;
-    if (!name || !role) {
-      res.status(400).json({ message: 'Los campos name y role son requeridos', code: 'VALIDATION_ERROR' });
+    if (!name || !role || !email || !area) {
+      res.status(400).json({
+        message: 'Los campos name, role, email y area son requeridos',
+        code: 'VALIDATION_ERROR',
+      });
       return;
     }
 
@@ -91,7 +88,7 @@ router.post('/:id/members', roleGuard('facilitator', 'admin'), async (req, res, 
       `INSERT INTO committee_members (committee_id, name, role, email, area)
        VALUES ($1, $2, $3, $4, $5)
        RETURNING *`,
-      [req.params.id, name, role, email ?? null, area ?? null],
+      [req.params.id, name, role, email, area],
     );
 
     res.status(201).json(result.rows[0]);
@@ -122,13 +119,15 @@ router.delete('/:committeeId/members/:memberId', roleGuard('facilitator', 'admin
 });
 
 // PUT /:committeeId/decisions/:number — Actualizar respuesta de decisión
+// El frontend puede enviar `response` (nombre real) o `answer` (alias legacy).
 router.put('/:committeeId/decisions/:number', async (req, res, next) => {
   try {
     const { committeeId, number } = req.params;
-    const { answer, decidedAt } = req.body;
+    const { response, answer, decidedAt } = req.body;
+    const responseValue = response ?? answer ?? null;
 
     const existing = await getOne(
-      'SELECT id FROM committee_decisions WHERE committee_id = $1 AND decision_number = $2',
+      'SELECT id FROM foundational_decisions WHERE committee_id = $1 AND number = $2',
       [committeeId, parseInt(number, 10)],
     );
     if (!existing) {
@@ -137,13 +136,12 @@ router.put('/:committeeId/decisions/:number', async (req, res, next) => {
     }
 
     const result = await query(
-      `UPDATE committee_decisions SET
-         answer = COALESCE($1, answer),
-         decided_at = COALESCE($2, decided_at),
-         updated_at = NOW()
-       WHERE committee_id = $3 AND decision_number = $4
+      `UPDATE foundational_decisions SET
+         response = COALESCE($1, response),
+         decided_at = COALESCE($2, decided_at)
+       WHERE committee_id = $3 AND number = $4
        RETURNING *`,
-      [answer ?? null, decidedAt ?? null, committeeId, parseInt(number, 10)],
+      [responseValue, decidedAt ?? null, committeeId, parseInt(number, 10)],
     );
 
     res.json(result.rows[0]);
@@ -162,7 +160,7 @@ router.post('/:id/constitute', roleGuard('facilitator', 'admin'), async (req, re
     }
 
     const result = await query(
-      `UPDATE committees SET constituted_at = NOW(), updated_at = NOW() WHERE id = $1 RETURNING *`,
+      `UPDATE committees SET constituted_at = NOW() WHERE id = $1 RETURNING *`,
       [req.params.id],
     );
 

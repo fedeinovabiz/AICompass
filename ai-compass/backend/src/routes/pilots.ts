@@ -64,26 +64,48 @@ router.get('/:id', async (req, res, next) => {
 router.post('/', async (req, res, next) => {
   try {
     const {
-      organizationId, name, description, targetProcess, startDate, endDate,
+      organizationId, title, processDescription,
+      processBefore, processAfter, tool, teamSize,
+      championName, championEmail,
+      startDate,
       implementationType, cujId, valuePnl, valuePnlType, valueEffort, valueRisk, valueTimeToValue,
       departmentAreaId,
     } = req.body;
-    if (!organizationId || !name) {
-      res.status(400).json({ message: 'Los campos organizationId y name (title) son requeridos', code: 'VALIDATION_ERROR' });
+
+    const missing: string[] = [];
+    if (!organizationId) missing.push('organizationId');
+    if (!title) missing.push('title');
+    if (!processBefore) missing.push('processBefore');
+    if (!processAfter) missing.push('processAfter');
+    if (!tool) missing.push('tool');
+    if (teamSize == null) missing.push('teamSize');
+    if (!championName) missing.push('championName');
+    if (!championEmail) missing.push('championEmail');
+    if (missing.length > 0) {
+      res.status(400).json({
+        message: `Campos requeridos faltantes: ${missing.join(', ')}`,
+        code: 'VALIDATION_ERROR',
+      });
       return;
     }
 
     const valueScore = calcValueScore(valuePnl, valueEffort, valueRisk, valueTimeToValue);
+    const description = processDescription ?? title;
 
     const result = await query(
-      `INSERT INTO pilots (organization_id, title, process_description, target_process, start_date, end_date, status,
-        implementation_type, cuj_id, value_pnl, value_pnl_type, value_effort, value_risk, value_time_to_value, value_score,
-        department_area_id)
-       VALUES ($1, $2, $3, $4, $5, $6, 'planning', $7, $8, $9, $10, $11, $12, $13, $14, $15)
+      `INSERT INTO pilots
+         (organization_id, title, process_description, process_before, process_after,
+          tool, team_size, champion_name, champion_email, status,
+          start_date, implementation_type, cuj_id,
+          value_pnl, value_pnl_type, value_effort, value_risk, value_time_to_value, value_score,
+          department_area_id)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, 'designing', $10, $11, $12, $13, $14, $15, $16, $17, $18, $19)
        RETURNING *`,
       [
-        organizationId, name, description ?? null, targetProcess ?? null, startDate ?? null, endDate ?? null,
-        implementationType ?? 'redesign', cujId ?? null, valuePnl ?? null, valuePnlType ?? null,
+        organizationId, title, description, processBefore, processAfter,
+        tool, teamSize, championName, championEmail,
+        startDate ?? null, implementationType ?? 'redesign', cujId ?? null,
+        valuePnl ?? null, valuePnlType ?? null,
         valueEffort ?? null, valueRisk ?? null, valueTimeToValue ?? null, valueScore,
         departmentAreaId ?? null,
       ],
@@ -156,9 +178,18 @@ router.put('/:id', async (req, res, next) => {
 });
 
 // POST /:id/metrics — Agregar entrada de métricas (incluye adoptionMetrics)
+// Body esperado: { date: string ISO, values: Record<string, number>, adoptionMetrics?, notes? }
 router.post('/:id/metrics', async (req, res, next) => {
   try {
-    const { metricName, value, unit, adoptionMetrics, notes } = req.body;
+    const { date, values, adoptionMetrics, notes } = req.body;
+
+    if (!date || !values) {
+      res.status(400).json({
+        message: 'Los campos date y values son requeridos',
+        code: 'VALIDATION_ERROR',
+      });
+      return;
+    }
 
     const pilotExists = await getOne('SELECT id FROM pilots WHERE id = $1', [req.params.id]);
     if (!pilotExists) {
@@ -167,14 +198,13 @@ router.post('/:id/metrics', async (req, res, next) => {
     }
 
     const result = await query(
-      `INSERT INTO pilot_metrics (pilot_id, metric_name, value, unit, adoption_metrics, notes)
-       VALUES ($1, $2, $3, $4, $5, $6)
+      `INSERT INTO pilot_metrics (pilot_id, date, values, adoption_metrics, notes)
+       VALUES ($1, $2, $3, $4, $5)
        RETURNING *`,
       [
         req.params.id,
-        metricName ?? null,
-        value ?? null,
-        unit ?? null,
+        date,
+        JSON.stringify(values),
         adoptionMetrics ? JSON.stringify(adoptionMetrics) : null,
         notes ?? null,
       ],

@@ -58,6 +58,47 @@ router.get('/:id', async (req, res, next) => {
   }
 });
 
+// GET /:id/cross-analysis — Último análisis cross-sesión guardado para la organización
+router.get('/:id/cross-analysis', async (req, res, next) => {
+  try {
+    const analysis = await getOne<{
+      id: string;
+      organization_id: string;
+      dimension_scores: unknown;
+      committee_recommendation: unknown;
+      deep_dive_recommendations: unknown;
+      quick_win_suggestions: unknown;
+      generated_at: string;
+    }>(
+      `SELECT * FROM cross_session_analyses
+       WHERE organization_id = $1
+       ORDER BY generated_at DESC
+       LIMIT 1`,
+      [req.params.id],
+    );
+
+    if (!analysis) {
+      res.status(404).json({
+        message: 'No hay análisis cross-sesión para esta organización',
+        code: 'NOT_FOUND',
+      });
+      return;
+    }
+
+    res.json({
+      id: analysis.id,
+      organizationId: analysis.organization_id,
+      dimensionScores: analysis.dimension_scores,
+      committeeRecommendation: analysis.committee_recommendation,
+      deepDiveRecommendations: analysis.deep_dive_recommendations,
+      quickWinSuggestions: analysis.quick_win_suggestions,
+      generatedAt: analysis.generated_at,
+    });
+  } catch (err) {
+    next(err);
+  }
+});
+
 // POST / — Crear organización (solo facilitator/admin)
 router.post('/', roleGuard('facilitator', 'admin'), async (req, res, next) => {
   try {

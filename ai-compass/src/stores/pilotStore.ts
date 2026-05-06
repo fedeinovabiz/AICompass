@@ -90,10 +90,10 @@ export const usePilotStore = create<PilotState>((set) => ({
     }
   },
 
-  createPilot: async (_orgId: string, data: CreatePilotData) => {
+  createPilot: async (orgId: string, data: CreatePilotData) => {
     set({ isLoading: true, error: null });
     try {
-      const pilot = await apiPost<Pilot>(`/pilots`, data);
+      const pilot = await apiPost<Pilot>(`/pilots`, { ...data, organizationId: orgId });
       set((state) => ({ pilots: [...state.pilots, pilot], isLoading: false }));
       return pilot;
     } catch (err) {
